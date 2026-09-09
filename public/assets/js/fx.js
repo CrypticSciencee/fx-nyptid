@@ -1,5 +1,5 @@
 (() => {
-  const data = window.FX;
+  const data = window.FX || { hates: [], likes: [], evidence: [], people: [], timeline: [] };
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
@@ -38,13 +38,14 @@
 
   function renderEvidence() {
     const root = $("#exhibit-grid");
+    if (!root) return;
     root.innerHTML = data.evidence
       .map(
         (e) => `
       <article class="shot glass">
         <figure>
           <button class="frame-hit" type="button" data-id="${e.id}" aria-label="Open ${e.kicker}">
-            <div class="frame"><img src="assets/evidence/${e.file}" alt="${e.charge}" loading="lazy"></div>
+            <div class="frame"><img src="/assets/evidence/${e.file}" alt="${e.charge}" loading="lazy"></div>
           </button>
           <figcaption>
             <div class="kicker">${e.kicker}</div>
@@ -65,9 +66,9 @@
 
   function openLb(id) {
     const e = data.evidence.find((x) => x.id === id);
-    if (!e) return;
     const lb = $("#lightbox");
-    $("#lb-img").src = `assets/evidence/${e.file}`;
+    if (!e || !lb) return;
+    $("#lb-img").src = `/assets/evidence/${e.file}`;
     $("#lb-img").alt = e.charge;
     $("#lb-kicker").textContent = e.kicker;
     $("#lb-charge").textContent = e.charge;
@@ -80,16 +81,20 @@
     $("#lb-actions").innerHTML = poster + quoted;
     lb.hidden = false;
     document.body.style.overflow = "hidden";
-    $("#lb-close").focus();
+    $("#lb-close")?.focus();
   }
 
   function closeLb() {
-    $("#lightbox").hidden = true;
+    const lb = $("#lightbox");
+    if (!lb) return;
+    lb.hidden = true;
     document.body.style.overflow = "";
   }
 
   function renderTimeline() {
-    $("#timeline").innerHTML = data.timeline
+    const el = $("#timeline");
+    if (!el) return;
+    el.innerHTML = data.timeline
       .map((t) => {
         const inner = `<time datetime="${t.t}">${t.t}</time><div><h4>${t.title}</h4><p>${t.body}</p></div>`;
         return t.url
@@ -100,7 +105,9 @@
   }
 
   function renderPeople() {
-    $("#people-grid").innerHTML = data.people
+    const el = $("#people-grid");
+    if (!el) return;
+    el.innerHTML = data.people
       .map(
         (p) => `
       <a class="person glass" href="${p.url}" target="_blank" rel="noopener noreferrer">
@@ -115,14 +122,15 @@
   }
 
   const allRows = [
-    ...data.hates.map((h, i) => ({ n: i + 1, cat: h[0], text: h[1], kind: "hate" })),
-    ...data.likes.map((h, i) => ({ n: i + 1, cat: h[0], text: h[1], kind: "like" }))
+    ...(data.hates || []).map((h, i) => ({ n: i + 1, cat: h[0], text: h[1], kind: "hate" })),
+    ...(data.likes || []).map((h, i) => ({ n: i + 1, cat: h[0], text: h[1], kind: "like" }))
   ];
 
   let filter = "hate";
   let query = "";
 
   function renderLedger() {
+    if (!$("#ledger-list")) return;
     const list = allRows.filter((r) => {
       const catOk =
         filter === "all" ||
@@ -133,9 +141,12 @@
       const textOk = !q || r.text.toLowerCase().includes(q) || r.cat.includes(q);
       return catOk && textOk;
     });
-    $("#hate-count").textContent = String(data.hates.length);
-    $("#like-count").textContent = String(data.likes.length);
-    $("#shown-count").textContent = String(list.length);
+    const hateCount = $("#hate-count");
+    const likeCount = $("#like-count");
+    const shown = $("#shown-count");
+    if (hateCount) hateCount.textContent = String((data.hates || []).length);
+    if (likeCount) likeCount.textContent = String((data.likes || []).length);
+    if (shown) shown.textContent = String(list.length);
     $("#ledger-list").innerHTML = list.length
       ? list
           .map(
@@ -153,6 +164,7 @@
   }
 
   function bindLedger() {
+    if (!$("#ledger-list")) return;
     $$("[data-filter]").forEach((btn) => {
       btn.addEventListener("click", () => {
         $$("[data-filter]").forEach((b) => b.classList.remove("on"));
@@ -161,7 +173,7 @@
         renderLedger();
       });
     });
-    $("#search").addEventListener("input", (e) => {
+    $("#search")?.addEventListener("input", (e) => {
       query = e.target.value;
       renderLedger();
     });
@@ -179,6 +191,7 @@
 
   function counters() {
     const els = $$("[data-count]");
+    if (!els.length) return;
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((en) => {
@@ -205,7 +218,7 @@
   }
 
   function nav() {
-    const nav = $(".nav");
+    const nav = $("#nav");
     const burger = $("#burger");
     burger?.addEventListener("click", () => {
       const open = nav.classList.toggle("open");
@@ -217,7 +230,7 @@
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         closeLb();
-        nav.classList.remove("open");
+        nav?.classList.remove("open");
       }
       const tag = document.activeElement?.tagName;
       if (e.key === "/" && tag !== "INPUT" && tag !== "TEXTAREA") {
@@ -225,10 +238,10 @@
         $("#search")?.focus();
       }
     });
-    $("#lightbox").addEventListener("click", (e) => {
+    $("#lightbox")?.addEventListener("click", (e) => {
       if (e.target.id === "lightbox") closeLb();
     });
-    $("#lb-close").addEventListener("click", closeLb);
+    $("#lb-close")?.addEventListener("click", closeLb);
   }
 
   function proofCard(item) {
@@ -250,10 +263,11 @@
 
   async function loadProofs() {
     const wall = $("#proof-wall");
+    if (!wall) return;
     try {
       const res = await fetch("/api/proof", { cache: "no-store" });
-      const data = await res.json();
-      const items = data.items || [];
+      const payload = await res.json();
+      const items = payload.items || [];
       wall.innerHTML = items.length
         ? items.map(proofCard).join("")
         : `<div class="empty glass">No public filings yet. Be the first. Link the account. Link the post.</div>`;
@@ -265,6 +279,7 @@
   function bindProofForm() {
     const form = $("#proof-form");
     const status = $("#proof-status");
+    if (!form) return;
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       status.classList.remove("err");
@@ -278,8 +293,8 @@
           cache: "no-store",
           body: JSON.stringify(payload)
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Rejected.");
+        const out = await res.json();
+        if (!res.ok) throw new Error(out.error || "Rejected.");
         status.textContent = "Filed. It’s on the wall.";
         form.reset();
         await loadProofs();

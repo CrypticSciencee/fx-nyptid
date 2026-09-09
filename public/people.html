@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>LIVE | FX</title>
-  <meta name="description" content="Live feed of people saying why they hate x.com, with links to the posts.">
-  <link rel="canonical" href="https://fx.nyptid.com/live">
+  <title>People | FX</title>
+  <meta name="description" content="Every person in the exhibits, as a door. Absolute profile URLs.">
+  <link rel="canonical" href="https://fx.nyptid.com/people">
   <meta name="theme-color" content="#05060a">
-  <meta property="og:title" content="LIVE | FX">
-  <meta property="og:url" content="https://fx.nyptid.com/live">
+  <meta property="og:title" content="People | FX">
+  <meta property="og:url" content="https://fx.nyptid.com/people">
   <meta property="og:image" content="https://fx.nyptid.com/assets/bg/hero.jpg">
   <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,10 +16,9 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/fx.css">
 </head>
-<body class="is-live">
+<body>
   <div class="noise" aria-hidden="true"></div>
   <div class="vignette" aria-hidden="true"></div>
-
   <header class="nav glass" id="nav">
     <a class="brand" href="/">
       <img class="brand-mark" src="/assets/icons/logo.svg" width="28" height="28" alt="">
@@ -29,28 +28,24 @@
       <a href="/exhibits">Exhibits</a>
       <a href="/case">Case file</a>
       <a href="/hates">150 hates</a>
-      <a href="/people">People</a>
-      <a href="/live" class="nav-live" aria-current="page">Live feed</a>
+      <a href="/people" aria-current="page">People</a>
+      <a href="/live" class="nav-live">Live feed</a>
       <a href="/proof">Submit proof</a>
     </nav>
-    <a class="nav-cta" href="/proof">Submit proof</a>
+    <a class="nav-cta" href="/live">Live feed</a>
     <button class="burger" id="burger" type="button" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
   </header>
 
-  <div class="onair" role="status" aria-live="polite">
-    <span class="onair-live"><i></i> LIVE</span>
-    <span class="onair-msg">Listening for posts about x.com</span>
-    <span class="onair-stat" id="onair-count">0 on the wire</span>
-    <span class="onair-stat" id="onair-ping">connecting</span>
-  </div>
-
-  <main class="live-page">
-    <div class="wrap live-wrap">
-      <header class="live-head">
-        <h1>Live feed</h1>
-        <p>People saying why they hate x.com. Every row is a handle and a post. This page is live and updates itself.</p>
-      </header>
-      <div class="feed" id="feed" aria-live="polite"></div>
+  <main class="page">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <div class="kicker">05 / The humans</div>
+          <h1>Every person in the exhibits, as a door.</h1>
+        </div>
+        <p>Absolute profile URLs. No soft mentions. If they said it, you can walk into their house and knock.</p>
+      </div>
+      <div class="people-grid" id="people-grid"></div>
     </div>
   </main>
 
@@ -58,15 +53,12 @@
     <div class="wrap foot">
       <a class="foot-brand" href="/">
         <img src="/assets/icons/logo.svg" width="36" height="36" alt="">
-        <span>
-          <strong>© FX</strong>
-          <em>fx.nyptid.com</em>
-        </span>
+        <span><strong>© FX</strong><em>fx.nyptid.com</em></span>
       </a>
       <p class="byline">by NYPTID Industries Advanced Technologies</p>
     </div>
   </footer>
-
-  <script src="/assets/js/feed.js"></script>
+  <script src="/assets/js/data.js"></script>
+  <script src="/assets/js/fx.js"></script>
 </body>
 </html>

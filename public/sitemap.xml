@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://fx.nyptid.com/</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
+  <url><loc>https://fx.nyptid.com/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://fx.nyptid.com/exhibits</loc><changefreq>weekly</changefreq></url>
+  <url><loc>https://fx.nyptid.com/case</loc><changefreq>weekly</changefreq></url>
+  <url><loc>https://fx.nyptid.com/hates</loc><changefreq>daily</changefreq></url>
+  <url><loc>https://fx.nyptid.com/people</loc><changefreq>weekly</changefreq></url>
+  <url><loc>https://fx.nyptid.com/live</loc><changefreq>hourly</changefreq></url>
+  <url><loc>https://fx.nyptid.com/proof</loc><changefreq>daily</changefreq></url>
 </urlset>

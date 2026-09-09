@@ -125,7 +125,7 @@ button, input { font: inherit; color: inherit; }
 
 h1, h2, h3 { font-family: var(--font-display); margin: 0; color: var(--paper); letter-spacing: -0.04em; }
 h1 { font-weight: 800; }
-h2 { font-size: clamp(2rem, 4vw, 3.4rem); line-height: 0.95; }
+h2, .sec-head h1 { font-size: clamp(2rem, 4vw, 3.4rem); line-height: 0.95; }
 h3 { font-size: 1.35rem; letter-spacing: -0.03em; }
 
 .lede {
@@ -412,6 +412,11 @@ h3 { font-size: 1.35rem; letter-spacing: -0.03em; }
 
 /* SECTIONS */
 section { padding: 84px 0; position: relative; }
+.page {
+  padding: 128px 0 64px;
+  position: relative;
+  min-height: 100dvh;
+}
 
 .sec-head {
   display: grid;

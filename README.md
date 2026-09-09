@@ -10,7 +10,7 @@ The ledger in `public/assets/js/data.js` is the living file. New exhibits, new h
 
 ## Stack
 
-Static site plus a Worker for the proof form. No cache. Python receipts scraper in `scraper/`.
+Static site plus a Worker. Each nav tab is its own page (`/exhibits`, `/case`, `/hates`, `/people`, `/live`, `/proof`). No cache. Python receipts scraper in `scraper/`.
 
 ```
 public/

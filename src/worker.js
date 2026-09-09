@@ -78,8 +78,18 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    if (url.pathname === "/live" || url.pathname === "/live/") {
-      const page = await env.ASSETS.fetch(new URL("/live.html", request.url));
+    const PAGES = {
+      "/exhibits": "/exhibits.html",
+      "/case": "/case.html",
+      "/hates": "/hates.html",
+      "/people": "/people.html",
+      "/proof": "/proof.html",
+      "/live": "/live.html"
+    };
+    const cleanPath = url.pathname.replace(/\/+$/, "") || "/";
+    const pageFile = PAGES[cleanPath];
+    if (pageFile) {
+      const page = await env.ASSETS.fetch(new URL(pageFile, request.url));
       const headers = new Headers(page.headers);
       headers.set("cache-control", "no-store, no-cache, must-revalidate, max-age=0");
       return new Response(page.body, { status: page.status, headers });

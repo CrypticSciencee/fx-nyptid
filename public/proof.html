@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Submit proof | FX</title>
+  <meta name="description" content="File proof. Link the X account. Link the post.">
+  <link rel="canonical" href="https://fx.nyptid.com/proof">
+  <meta name="theme-color" content="#05060a">
+  <meta property="og:title" content="Submit proof | FX">
+  <meta property="og:url" content="https://fx.nyptid.com/proof">
+  <meta property="og:image" content="https://fx.nyptid.com/assets/bg/hero.jpg">
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/fx.css">
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <header class="nav glass" id="nav">
+    <a class="brand" href="/">
+      <img class="brand-mark" src="/assets/icons/logo.svg" width="28" height="28" alt="">
+      <span>FX</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="/exhibits">Exhibits</a>
+      <a href="/case">Case file</a>
+      <a href="/hates">150 hates</a>
+      <a href="/people">People</a>
+      <a href="/live" class="nav-live">Live feed</a>
+      <a href="/proof" aria-current="page">Submit proof</a>
+    </nav>
+    <a class="nav-cta" href="/live">Live feed</a>
+    <button class="burger" id="burger" type="button" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </header>
+
+  <main class="page">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <div class="kicker">06 / The intake</div>
+          <h1>Got receipts? Link the X account. Link the post.</h1>
+        </div>
+        <p>No verification badge required. A public profile URL and a public post URL are required. If you cannot link it, it is not proof.</p>
+      </div>
+      <div class="proof-layout">
+        <form class="glass proof-form" id="proof-form" novalidate>
+          <div class="hp" aria-hidden="true">
+            <label for="company">Company</label>
+            <input id="company" name="company" type="text" tabindex="-1" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="handle">X handle</label>
+            <input id="handle" name="handle" type="text" placeholder="@handle" maxlength="16" autocomplete="username" required>
+          </div>
+          <div class="field">
+            <label for="profile_url">X profile URL</label>
+            <input id="profile_url" name="profile_url" type="url" placeholder="https://x.com/handle" inputmode="url" required>
+          </div>
+          <div class="field">
+            <label for="proof_url">Proof post URL</label>
+            <input id="proof_url" name="proof_url" type="url" placeholder="https://x.com/handle/status/123" inputmode="url" required>
+          </div>
+          <div class="field">
+            <label for="extra_urls">More links (optional)</label>
+            <input id="extra_urls" name="extra_urls" type="text" placeholder="More x.com/status URLs, separated by spaces">
+          </div>
+          <div class="field">
+            <label for="display_name">Display name (optional)</label>
+            <input id="display_name" name="display_name" type="text" maxlength="80" placeholder="How you want it listed">
+          </div>
+          <div class="field">
+            <label for="statement">What happened</label>
+            <textarea id="statement" name="statement" rows="6" maxlength="1200" placeholder="What X did. What you posted. Why it is bullshit." required></textarea>
+          </div>
+          <div class="form-actions">
+            <button class="btn solid" type="submit">File the proof</button>
+            <p class="form-status" id="proof-status" role="status"></p>
+          </div>
+        </form>
+        <aside class="glass proof-aside">
+          <img class="logo-lockup" src="/assets/icons/mark.jpg" alt="FX emblem">
+          <h3>Rules of the wall</h3>
+          <p>Handle, profile link, and a real <span class="mono">/status/</span> URL. Blue check optional. No post link, no filing.</p>
+          <a class="btn" href="/live" style="margin-top:16px">Open the live feed</a>
+        </aside>
+      </div>
+      <div class="proof-wall" id="proof-wall"></div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <a class="foot-brand" href="/">
+        <img src="/assets/icons/logo.svg" width="36" height="36" alt="">
+        <span><strong>© FX</strong><em>fx.nyptid.com</em></span>
+      </a>
+      <p class="byline">by NYPTID Industries Advanced Technologies</p>
+    </div>
+  </footer>
+  <script src="/assets/js/fx.js"></script>
+</body>
+</html>
