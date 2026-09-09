@@ -1187,6 +1187,17 @@ footer {
   border-color: transparent;
 }
 .mute { color: var(--mute); font-weight: 500; text-transform: none; letter-spacing: 0; }
+.field label.check-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 600;
+  color: var(--paper);
+  cursor: pointer;
+}
+.check-row input { width: 16px; height: 16px; accent-color: var(--cyan); }
 .foot-links {
   display: flex;
   flex-wrap: wrap;

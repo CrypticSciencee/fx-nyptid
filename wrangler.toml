@@ -18,5 +18,8 @@ custom_domain = true
 binding = "PROOF"
 id = "b995375e839442b39d8505b616cba7e6"
 
-# Jackson: npx wrangler secret put STRIPE_PAYMENT_LINK
-# Paste the Stripe Payment Link URL. /donate will send people there after logging the pledge.
+# Journalism donations — other Claude session sets these. Never commit the values.
+# Preferred: npx wrangler secret put STRIPE_SECRET_KEY
+# Fallback:  npx wrangler secret put STRIPE_PAYMENT_LINK
+# Then:      npx wrangler deploy
+# See DONATE-HANDOFF.md

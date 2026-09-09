@@ -40,16 +40,16 @@
     <div class="wrap donate-wrap">
       <div class="sec-head">
         <div>
-          <div class="kicker">Support FX</div>
+          <div class="kicker">Support journalism</div>
           <h1>Genuine journalism. Named sources. No ads.</h1>
         </div>
-        <p>FX is a forensic ledger of x.com and a live world desk. Receipts, not vibes. If this is useful, keep the scraper, the quotes, and the wires running.</p>
+        <p>FX is a forensic ledger of x.com and a live world desk. Receipts, not vibes. Donations keep the scraper, the quotes, and the wires running.</p>
       </div>
 
       <div class="donate-layout">
         <form class="proof-form glass" id="donate-form" novalidate>
           <div class="kicker" id="donate-ready">Checkout status</div>
-          <p class="sheet-lede" id="donate-lede">Pick an amount. Jackson is wiring Stripe. Until checkout is live, the pledge is logged so nothing is lost.</p>
+          <p class="sheet-lede" id="donate-lede">Pick an amount. Stripe takes the payment. Every pledge is logged.</p>
           <div class="field">
             <label>Amount (USD)</label>
             <div class="amount-row" id="amount-row">
@@ -65,6 +65,12 @@
             <input id="amount" name="amount" type="number" min="1" max="100000" step="1" value="40" required>
           </div>
           <div class="field">
+            <label class="check-row" for="recurring">
+              <input id="recurring" name="recurring" type="checkbox">
+              Monthly, same amount
+            </label>
+          </div>
+          <div class="field">
             <label for="name">Name <span class="mute">(optional)</span></label>
             <input id="name" name="name" type="text" maxlength="80" placeholder="How we should thank you">
           </div>
@@ -77,7 +83,7 @@
             <textarea id="note" name="note" rows="3" maxlength="500" placeholder="Why you are backing the desk."></textarea>
           </div>
           <div class="form-actions">
-            <button class="btn solid" type="submit" id="donate-submit">Pledge and continue</button>
+            <button class="btn solid" type="submit" id="donate-submit">Donate</button>
             <p class="form-status" id="donate-status" role="status"></p>
           </div>
         </form>
@@ -85,8 +91,8 @@
         <aside class="proof-aside glass">
           <div class="kicker">Where it goes</div>
           <h3>The desk, the scraper, the wall.</h3>
-          <p>Donations support genuine true journalism on FX: live crude quotes, named wires, verified X receipts, and the people who keep the case file honest.</p>
-          <p class="mono" style="margin-top:16px">Stripe Payment Link is the checkout. Jackson sets <code>STRIPE_PAYMENT_LINK</code> on the Worker. This page already logs every pledge.</p>
+          <p>Donations support genuine true journalism on FX: live crude quotes, named wires, verified X receipts, and the people who keep the case file honest. Not ads. Not X Premium.</p>
+          <p class="mono" style="margin-top:16px">USD · Stripe Checkout · purpose: journalism. Cancel returns here. Paid landings go to /donate/thanks.</p>
         </aside>
       </div>
     </div>
@@ -99,7 +105,7 @@
         <span><strong>© FX</strong><em>fx.nyptid.com</em></span>
       </a>
       <nav class="foot-links" aria-label="Footer">
-        <a href="/live">Live</a>
+        <a href="/live">Alerts</a>
         <a href="/desk">Desk</a>
         <a href="/donate">Donate</a>
         <a href="/proof">Proof</a>
@@ -107,6 +113,6 @@
       <p class="byline">by NYPTID Industries Advanced Technologies</p>
     </div>
   </footer>
-  <script src="/assets/js/donate.js?v=12"></script>
+  <script src="/assets/js/donate.js?v=13"></script>
 </body>
 </html>

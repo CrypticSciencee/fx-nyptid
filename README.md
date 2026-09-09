@@ -52,15 +52,16 @@ That ships Worker `fx` with the custom domain `fx.nyptid.com` on the `nyptid.com
 
 ## Donate
 
-[`/donate`](https://fx.nyptid.com/donate) supports genuine journalism on FX. Pledges are logged to KV (`donations`).
+[`/donate`](https://fx.nyptid.com/donate) supports genuine journalism on FX. Pledges are logged to KV (`donations`). Stripe Checkout is created per amount when `STRIPE_SECRET_KEY` is set. Thanks page: [`/donate/thanks`](https://fx.nyptid.com/donate/thanks).
 
-Jackson: create a Stripe Payment Link, then:
+Paste `DONATE-HANDOFF.md` into the Claude session wiring Stripe. That session should only:
 
 ```bash
-npx wrangler secret put STRIPE_PAYMENT_LINK
+npx wrangler secret put STRIPE_SECRET_KEY
+npx wrangler deploy
 ```
 
-Paste the Payment Link URL and redeploy. `/donate` will log the pledge and send people to Stripe. Until the secret is set, pledges still land in KV so nothing is lost.
+Until the secret is set, pledges still land in KV so nothing is lost.
 
 ## Exhibits
 

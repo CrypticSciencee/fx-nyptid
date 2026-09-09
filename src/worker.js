@@ -356,6 +356,56 @@ function stripeCheckout(base, pledge) {
   }
 }
 
+function donateReady(env) {
+  if (env.STRIPE_SECRET_KEY) return "checkout";
+  if (env.STRIPE_PAYMENT_LINK) return "link";
+  return null;
+}
+
+async function createStripeCheckout(env, pledge) {
+  const mode = donateReady(env);
+  if (mode === "checkout") {
+    const cents = Math.round(Number(pledge.amount) * 100);
+    const body = new URLSearchParams();
+    body.set("mode", pledge.recurring ? "subscription" : "payment");
+    body.set("success_url", "https://fx.nyptid.com/donate/thanks?session_id={CHECKOUT_SESSION_ID}");
+    body.set("cancel_url", "https://fx.nyptid.com/donate");
+    body.set("client_reference_id", pledge.id);
+    body.set("line_items[0][quantity]", "1");
+    body.set("line_items[0][price_data][currency]", "usd");
+    body.set("line_items[0][price_data][unit_amount]", String(cents));
+    body.set("line_items[0][price_data][product_data][name]", "FX journalism");
+    body.set(
+      "line_items[0][price_data][product_data][description]",
+      "Support genuine journalism on fx.nyptid.com"
+    );
+    if (pledge.recurring) body.set("line_items[0][price_data][recurring][interval]", "month");
+    if (pledge.email) body.set("customer_email", pledge.email);
+    body.set("metadata[pledge_id]", pledge.id);
+    body.set("metadata[purpose]", "journalism");
+    if (pledge.name) body.set("metadata[name]", pledge.name);
+    if (pledge.note) body.set("metadata[note]", pledge.note.slice(0, 400));
+    if (!pledge.recurring) body.set("payment_intent_data[description]", `FX journalism · ${pledge.id}`);
+    const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body
+    });
+    const data = await res.json();
+    if (!res.ok || !data.url) {
+      throw new Error(data.error?.message || "Stripe checkout failed.");
+    }
+    return { url: data.url, mode: "checkout", session_id: data.id };
+  }
+  if (mode === "link") {
+    return { url: stripeCheckout(env.STRIPE_PAYMENT_LINK, pledge), mode: "link", session_id: null };
+  }
+  return { url: null, mode: null, session_id: null };
+}
+
 async function ingestStatus(env, statusUrl, source, extra = {}, opts = {}) {
   const postUrl = xUrl(statusUrl);
   if (!STATUS.test(postUrl)) return { ok: false, reason: "Not an x.com/status URL." };
@@ -396,7 +446,8 @@ export default {
       "/proof": "/proof.html",
       "/live": "/live.html",
       "/desk": "/desk.html",
-      "/donate": "/donate.html"
+      "/donate": "/donate.html",
+      "/donate/thanks": "/donate-thanks.html"
     };
     const cleanPath = url.pathname.replace(/\/+$/, "") || "/";
     const pageFile = PAGES[cleanPath];
@@ -506,14 +557,15 @@ export default {
     }
 
     if (url.pathname === "/api/donate" && request.method === "GET") {
-      const stripe = env.STRIPE_PAYMENT_LINK || null;
+      const mode = donateReady(env);
       return json({
-        stripe,
-        ready: Boolean(stripe),
+        ready: Boolean(mode),
+        mode,
         currency: "USD",
-        note: stripe
+        purpose: "journalism",
+        note: mode
           ? "Stripe checkout is live."
-          : "Pledges are logged. Jackson wires Stripe with STRIPE_PAYMENT_LINK."
+          : "Pledges are logged. Set STRIPE_SECRET_KEY on Worker fx to take payment."
       });
     }
 
@@ -539,6 +591,8 @@ export default {
         id: crypto.randomUUID(),
         amount,
         currency: "USD",
+        purpose: "journalism",
+        recurring: Boolean(body.recurring),
         email: clean(body.email, 120),
         name: clean(body.name, 80),
         note: clean(body.note, 500),
@@ -547,13 +601,25 @@ export default {
       const rows = await readList(env, "donations");
       rows.unshift(pledge);
       await writeList(env, "donations", rows);
-      const stripe = stripeCheckout(env.STRIPE_PAYMENT_LINK, pledge);
-      return json({
-        ok: true,
-        pledge,
-        stripe,
-        ready: Boolean(stripe)
-      });
+      try {
+        const checkout = await createStripeCheckout(env, pledge);
+        return json({
+          ok: true,
+          pledge,
+          stripe: checkout.url,
+          mode: checkout.mode,
+          session_id: checkout.session_id,
+          ready: Boolean(checkout.url)
+        });
+      } catch (err) {
+        return json({
+          ok: true,
+          pledge,
+          stripe: null,
+          ready: false,
+          error: String(err.message || err)
+        }, 502);
+      }
     }
 
     if (url.pathname === "/api/feed" && request.method === "GET") {

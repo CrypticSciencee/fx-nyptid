@@ -13,6 +13,8 @@
   const ready = document.getElementById("donate-ready");
   const lede = document.getElementById("donate-lede");
   const chips = document.querySelectorAll("#amount-row [data-amount]");
+  const recurring = document.getElementById("recurring");
+  let checkoutReady = false;
 
   function setStatus(msg, err) {
     if (!status) return;
@@ -37,13 +39,20 @@
     try {
       const res = await fetch("/api/donate", { cache: "no-store" });
       const data = await res.json();
-      if (ready) ready.textContent = data.ready ? "Stripe checkout is live" : "Pledges logging · Stripe next";
-      if (lede) {
-        lede.textContent = data.ready
-          ? "Pick an amount. We log the pledge, then Stripe takes the payment."
-          : "Pick an amount. Jackson is wiring Stripe. Until checkout is live, the pledge is logged so nothing is lost.";
+      checkoutReady = Boolean(data.ready);
+      if (ready) {
+        ready.textContent = checkoutReady
+          ? data.mode === "checkout"
+            ? "Stripe Checkout is live"
+            : "Stripe is live"
+          : "Pledges logging · checkout next";
       }
-      if (submit) submit.textContent = data.ready ? "Donate with Stripe" : "Pledge and continue";
+      if (lede) {
+        lede.textContent = checkoutReady
+          ? "Pick an amount. We log the pledge, then Stripe takes the payment. Monthly is optional."
+          : "Pick an amount. Checkout is being connected. The pledge is logged so nothing is lost.";
+      }
+      if (submit) submit.textContent = checkoutReady ? "Donate with Stripe" : "Pledge and continue";
     } catch {
       if (ready) ready.textContent = "Desk will still take the pledge";
     }
@@ -57,7 +66,7 @@
       return;
     }
     submit.disabled = true;
-    setStatus("Logging the pledge…");
+    setStatus(checkoutReady ? "Opening Stripe…" : "Logging the pledge…");
     try {
       const res = await fetch("/api/donate", {
         method: "POST",
@@ -66,11 +75,12 @@
           amount,
           name: document.getElementById("name")?.value || "",
           email: document.getElementById("email")?.value || "",
-          note: document.getElementById("note")?.value || ""
+          note: document.getElementById("note")?.value || "",
+          recurring: Boolean(recurring?.checked)
         })
       });
       const data = await res.json();
-      if (!res.ok) {
+      if (!res.ok && !data.pledge) {
         setStatus(data.error || "Could not log the pledge.", true);
         submit.disabled = false;
         return;
@@ -80,7 +90,12 @@
         window.location.href = data.stripe;
         return;
       }
-      setStatus(`Pledge logged for $${amount}. Checkout is being wired. Thank you.`);
+      if (data.error) {
+        setStatus(data.error, true);
+        submit.disabled = false;
+        return;
+      }
+      setStatus(`Pledge logged for $${amount}. Checkout is being connected. Thank you.`);
       form.reset();
       amountInput.value = "40";
       chips.forEach((b) => b.classList.toggle("sel", b.dataset.amount === "40"));

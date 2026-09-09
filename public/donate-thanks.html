@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thank you | FX</title>
+  <meta name="description" content="Thank you for supporting genuine journalism on FX.">
+  <link rel="canonical" href="https://fx.nyptid.com/donate/thanks">
+  <meta name="theme-color" content="#05060a">
+  <meta property="og:title" content="Thank you | FX">
+  <meta property="og:url" content="https://fx.nyptid.com/donate/thanks">
+  <meta property="og:image" content="https://fx.nyptid.com/assets/bg/hero.jpg">
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/fx.css?v=13">
+</head>
+<body class="inner">
+  <div class="noise" aria-hidden="true"></div>
+  <header class="nav glass" id="nav">
+    <a class="brand" href="/">
+      <img class="brand-mark" src="/assets/icons/logo.svg" width="28" height="28" alt="">
+      <span>FX</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="/exhibits">Exhibits</a>
+      <a href="/case">Cases</a>
+      <a href="/hates">Ledger</a>
+      <a href="/people">People</a>
+      <a href="/live" class="nav-live">Alerts</a>
+      <a href="/desk">Desk</a>
+      <a href="/proof">Submit proof</a>
+    </nav>
+    <a class="nav-cta" href="/donate">Donate</a>
+    <button class="burger" id="burger" type="button" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </header>
+
+  <main class="page">
+    <div class="wrap donate-wrap">
+      <div class="sec-head">
+        <div>
+          <div class="kicker">Receipt</div>
+          <h1>Thank you. The desk stays on.</h1>
+        </div>
+        <p>Your donation supports genuine journalism on FX: named sources, live quotes, and receipts with the post still attached. Stripe sends the card receipt. This page is the thank-you.</p>
+      </div>
+      <article class="proof-card glass" style="min-height:0;padding:28px">
+        <div class="kicker">What to do next</div>
+        <p>Read the live desk. File a receipt if you have one. Tell someone the slogan and the body are on the same page.</p>
+        <div class="hero-actions" style="margin-top:18px">
+          <a class="btn solid" href="/desk">Open the desk</a>
+          <a class="btn" href="/live">Global alerts</a>
+          <a class="btn" href="/donate">Donate again</a>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <a class="foot-brand" href="/">
+        <img src="/assets/icons/logo.svg" width="36" height="36" alt="">
+        <span><strong>© FX</strong><em>fx.nyptid.com</em></span>
+      </a>
+      <nav class="foot-links" aria-label="Footer">
+        <a href="/live">Alerts</a>
+        <a href="/desk">Desk</a>
+        <a href="/donate">Donate</a>
+        <a href="/proof">Proof</a>
+      </nav>
+      <p class="byline">by NYPTID Industries Advanced Technologies</p>
+    </div>
+  </footer>
+  <script>
+    (function () {
+      var burger = document.getElementById("burger");
+      var nav = document.getElementById("nav");
+      if (burger && nav) {
+        burger.addEventListener("click", function () {
+          var open = nav.classList.toggle("open");
+          burger.setAttribute("aria-expanded", open ? "true" : "false");
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
