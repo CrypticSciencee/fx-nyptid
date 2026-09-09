@@ -1,10 +1,13 @@
 (() => {
   const burger = document.getElementById("burger");
   const nav = document.getElementById("nav");
-  burger?.addEventListener("click", () => {
-    const open = nav.classList.toggle("open");
-    burger.setAttribute("aria-expanded", open ? "true" : "false");
-  });
+  if (burger && !burger.dataset.bound) {
+    burger.dataset.bound = "1";
+    burger.addEventListener("click", () => {
+      const open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
 
   const WAR_START = Date.UTC(2026, 1, 28);
 

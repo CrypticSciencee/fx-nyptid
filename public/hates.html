@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>150 hates | FX</title>
-  <meta name="description" content="150 reasons people hate x.com, and 50 reasons they stay.">
+  <title>Ledger | FX</title>
+  <meta name="description" content="The unbiased record of x.com: like, hate, neutral, and everything in between. Updated live.">
   <link rel="canonical" href="https://fx.nyptid.com/hates">
   <meta name="theme-color" content="#05060a">
-  <meta property="og:title" content="150 hates | FX">
+  <meta property="og:title" content="Ledger | FX">
   <meta property="og:url" content="https://fx.nyptid.com/hates">
   <meta property="og:image" content="https://fx.nyptid.com/assets/bg/hero.jpg">
   <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/css/fx.css?v=12">
+  <link rel="stylesheet" href="/assets/css/fx.css?v=13">
 </head>
 <body class="inner">
   <div class="noise" aria-hidden="true"></div>
@@ -26,10 +26,10 @@
     </a>
     <nav class="nav-links" aria-label="Primary">
       <a href="/exhibits">Exhibits</a>
-      <a href="/case">Case file</a>
-      <a href="/hates" aria-current="page">150 hates</a>
+      <a href="/case">Cases</a>
+      <a href="/hates" aria-current="page">Ledger</a>
       <a href="/people">People</a>
-      <a href="/live" class="nav-live">Live feed</a>
+      <a href="/live" class="nav-live">Alerts</a>
       <a href="/desk">Desk</a>
       <a href="/proof">Submit proof</a>
     </nav>
@@ -41,34 +41,40 @@
     <div class="wrap" style="position:relative;z-index:1">
       <div class="sec-head">
         <div>
-          <div class="kicker">03 / Dual ledger</div>
-          <h1>Why they stay. Why they want it burned.</h1>
+          <div class="kicker">03 / The record</div>
+          <h1>Like, hate, and the rest.</h1>
         </div>
-        <p>Honesty is the only flex this site has. X is still the firehose. It is also a hall of mirrors that invoices you for oxygen. Both columns are real.</p>
+        <p>FX is not affiliated with X. The job is the receipt, not the team. Like, hate, and neutral all sit on the same ledger. Live rows land as the wires and X filings move. <span class="mono" id="ledger-ping">connecting</span></p>
       </div>
-      <div class="split" style="margin-bottom:36px">
+      <div class="split trio" style="margin-bottom:36px">
         <article class="like glass">
-          <div class="kicker">Like</div>
-          <h3>The town square still has a pulse.</h3>
-          <p>Breaking news, Community Notes, officials you can heckle, long posts, an edit button, native video, Grok as a work tool, sports, markets, memes, the graph. People stay because every other network is slower, softer, or empty.</p>
+          <div class="kicker">Like · <span id="like-count">50</span></div>
+          <h3>The firehose is still a firehose.</h3>
+          <p>Breaking news, Notes, officials you can heckle, long posts, an edit button. People stay because every other network is slower, softer, or empty. That counts.</p>
+        </article>
+        <article class="note glass">
+          <div class="kicker">Neutral · <span id="neutral-count">0</span></div>
+          <h3>The product is a product.</h3>
+          <p>Single owner. Two feeds. A check that means a card. Ranking is not a court. These are facts about the machine, not a side.</p>
         </article>
         <article class="hate glass">
-          <div class="kicker">Hate</div>
-          <h3>The town square is also a product that hates you back.</h3>
-          <p>Pay-to-exist. Bots with checks. Tate funnels. Verified flat earth. Grok deepfake sludge. A slogan that does not survive a satire account. 150 specific receipts below.</p>
+          <div class="kicker">Hate · <span id="hate-count">150</span></div>
+          <h3>The product also hates you back.</h3>
+          <p>Pay-to-exist. Bots with checks. Funnels. A slogan that does not survive a satire account. Specific receipts, not a mood.</p>
         </article>
       </div>
       <div class="sec-head">
         <div>
-          <div class="kicker">04 / The ledger</div>
-          <h2><span id="hate-count">150</span> hates. <span id="like-count">50</span> likes.</h2>
+          <div class="kicker">04 / Everything</div>
+          <h2>The whole ledger.</h2>
         </div>
-        <p>Filter the sewage. Press <span class="mono">/</span> to search. Showing <span id="shown-count">150</span> rows.</p>
+        <p>Default is all of it. Press <span class="mono">/</span> to search. Showing <span id="shown-count">0</span> rows.</p>
       </div>
       <div class="ledger-tools">
-        <button class="chip on" data-filter="hate" type="button">Hate</button>
+        <button class="chip on" data-filter="all" type="button">All</button>
         <button class="chip like" data-filter="like" type="button">Like</button>
-        <button class="chip" data-filter="all" type="button">All</button>
+        <button class="chip neutral" data-filter="neutral" type="button">Neutral</button>
+        <button class="chip" data-filter="hate" type="button">Hate</button>
         <button class="chip" data-filter="speech" type="button">Speech</button>
         <button class="chip" data-filter="reach" type="button">Reach</button>
         <button class="chip" data-filter="bots" type="button">Bots</button>
@@ -92,7 +98,7 @@
         <span><strong>© FX</strong><em>fx.nyptid.com</em></span>
       </a>
       <nav class="foot-links" aria-label="Footer">
-        <a href="/live">Live</a>
+        <a href="/live">Alerts</a>
         <a href="/desk">Desk</a>
         <a href="/donate">Donate</a>
         <a href="/proof">Proof</a>
@@ -100,7 +106,7 @@
       <p class="byline">by NYPTID Industries Advanced Technologies</p>
     </div>
   </footer>
-  <script src="/assets/js/data.js?v=10"></script>
-  <script src="/assets/js/fx.js?v=10"></script>
+  <script src="/assets/js/data.js?v=13"></script>
+  <script src="/assets/js/fx.js?v=13"></script>
 </body>
 </html>

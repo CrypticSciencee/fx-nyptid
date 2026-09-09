@@ -236,8 +236,26 @@ const WORLD_FEEDS = [
   { name: "BBC World", url: "https://feeds.bbci.co.uk/news/world/rss.xml" },
   { name: "Al Jazeera", url: "https://www.aljazeera.com/xml/rss/all.xml" },
   { name: "Guardian", url: "https://www.theguardian.com/world/rss" },
-  { name: "OilPrice", url: "https://oilprice.com/rss/main" }
+  { name: "NPR World", url: "https://feeds.npr.org/1004/rss.xml" },
+  { name: "OilPrice", url: "https://oilprice.com/rss/main" },
+  { name: "Google News", url: "https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en" }
 ];
+
+const SPORT_TITLE =
+  /\b(us open|premier league|nba|nfl|mlb|nhl|wimbledon|alcaraz|federer|box score|kickoff)\b/i;
+
+function stance(text) {
+  const t = String(text || "").toLowerCase();
+  const hate =
+    /suspend|shadowban|tombstone|form letter|bot farm|paywall|censored|unban|appeal denied|hate this app|scam check|deepfake/;
+  const like =
+    /community notes|breaking first|love (x|twitter)|still the firehose|best place for news|following feed works|edit button/;
+  const h = hate.test(t);
+  const l = like.test(t);
+  if (h && !l) return "hate";
+  if (l && !h) return "like";
+  return "neutral";
+}
 
 async function loadWorld() {
   const results = await Promise.all(
@@ -261,19 +279,24 @@ async function loadWorld() {
   const seen = new Set();
   for (const { feed, xml } of results) {
     if (!xml) continue;
-    const blocks = xml.split(/<item[\s>]/i).slice(1, 8);
+    const blocks = xml.split(/<item[\s>]/i).slice(1, 10);
     for (const block of blocks) {
-      const title = clean(rssTag(block, "title"), 220);
+      const rawTitle = clean(rssTag(block, "title"), 240);
       const url = clean(rssLink(block), 400);
       const date = rssTag(block, "pubDate") || rssTag(block, "updated") || rssTag(block, "dc:date");
+      const source = clean(rssTag(block, "source"), 40) || feed.name;
+      let title = rawTitle;
+      if (source && title.toLowerCase().endsWith(` - ${source.toLowerCase()}`)) {
+        title = title.slice(0, title.length - source.length - 3).trim();
+      }
       if (!title || !url || !/^https?:\/\//i.test(url)) continue;
-      if (/\/sports\//i.test(url)) continue;
+      if (/\/sports\//i.test(url) || SPORT_TITLE.test(title)) continue;
       const key = title.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
       if (!key || seen.has(key)) continue;
       seen.add(key);
       const parsed = Date.parse(date);
       items.push({
-        source: feed.name,
+        source,
         title,
         url,
         published: Number.isFinite(parsed) ? new Date(parsed).toISOString() : ""
@@ -281,7 +304,44 @@ async function loadWorld() {
     }
   }
   items.sort((a, b) => Date.parse(b.published || 0) - Date.parse(a.published || 0));
-  return { items: items.slice(0, 24), generated_at: new Date().toISOString() };
+  return { items: items.slice(0, 40), generated_at: new Date().toISOString() };
+}
+
+async function loadAlerts(env) {
+  const [world, feed] = await Promise.all([
+    remember("world", 20000, loadWorld).catch(() => ({ items: [], generated_at: new Date().toISOString() })),
+    readList(env, "feed")
+  ]);
+  const items = [];
+  for (const row of world.items || []) {
+    items.push({
+      id: `wire:${row.url}`,
+      kind: "wire",
+      source: row.source,
+      handle: row.source,
+      display_name: row.source,
+      text: row.title,
+      url: row.url,
+      created_at: row.published || world.generated_at,
+      stance: "neutral"
+    });
+  }
+  for (const row of feed || []) {
+    items.push({
+      id: row.id,
+      kind: "x",
+      source: "X",
+      handle: row.handle,
+      display_name: row.display_name || row.handle,
+      text: row.text,
+      url: row.url,
+      profile_url: row.profile_url,
+      created_at: row.created_at,
+      stance: stance(`${row.text} ${row.handle}`)
+    });
+  }
+  items.sort((a, b) => Date.parse(b.created_at || 0) - Date.parse(a.created_at || 0));
+  return { items: items.slice(0, 80), generated_at: new Date().toISOString() };
 }
 
 function stripeCheckout(base, pledge) {
@@ -402,17 +462,45 @@ export default {
       }
     }
 
+    if (url.pathname === "/api/alerts" && request.method === "GET") {
+      try {
+        return json(await loadAlerts(env));
+      } catch (err) {
+        return json({ error: "Alerts unavailable.", detail: String(err), items: [] }, 502);
+      }
+    }
+
+    if (url.pathname === "/api/ledger" && request.method === "GET") {
+      try {
+        const alerts = await loadAlerts(env);
+        const live = (alerts.items || []).map((row) => ({
+          id: row.id,
+          kind: row.stance || "neutral",
+          cat: row.kind === "x" ? "x" : "world",
+          text: row.kind === "x" ? `@${row.handle}: ${row.text}` : row.text,
+          url: row.url,
+          source: row.source,
+          created_at: row.created_at
+        }));
+        return json({ live, generated_at: alerts.generated_at });
+      } catch (err) {
+        return json({ error: "Ledger live unavailable.", detail: String(err), live: [] }, 502);
+      }
+    }
+
     if (url.pathname === "/api/desk" && request.method === "GET") {
-      const [oilSettled, worldSettled, feed] = await Promise.all([
+      const [oilSettled, worldSettled, feed, alerts] = await Promise.all([
         remember("oil", 20000, loadOil).catch((err) => ({ error: "Oil quotes unavailable.", detail: String(err) })),
-        remember("world", 45000, loadWorld).catch(() => ({ items: [], generated_at: new Date().toISOString() })),
-        readList(env, "feed")
+        remember("world", 20000, loadWorld).catch(() => ({ items: [], generated_at: new Date().toISOString() })),
+        readList(env, "feed"),
+        loadAlerts(env).catch(() => ({ items: [], generated_at: new Date().toISOString() }))
       ]);
       return json({
         oil: oilSettled,
         world: worldSettled.items || [],
         world_at: worldSettled.generated_at || new Date().toISOString(),
         receipts: (feed || []).slice(0, 8),
+        alerts: alerts.items || [],
         generated_at: new Date().toISOString()
       });
     }

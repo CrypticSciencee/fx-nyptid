@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>LIVE | FX</title>
-  <meta name="description" content="Unfiltered live log of x.com. Scraper, RSS, and verified filings.">
+  <title>Alerts | FX</title>
+  <meta name="description" content="Global alerts in as close to real time as the wires and X receipts allow. A live desk, not a dump.">
   <link rel="canonical" href="https://fx.nyptid.com/live">
   <link rel="alternate" type="application/rss+xml" title="FX live" href="https://fx.nyptid.com/rss.xml">
   <meta name="theme-color" content="#05060a">
-  <meta property="og:title" content="LIVE | FX">
+  <meta property="og:title" content="Alerts | FX">
   <meta property="og:url" content="https://fx.nyptid.com/live">
   <meta property="og:image" content="https://fx.nyptid.com/assets/bg/hero.jpg">
   <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/css/fx.css?v=12">
+  <link rel="stylesheet" href="/assets/css/fx.css?v=13">
 </head>
 <body class="inner">
   <div class="noise" aria-hidden="true"></div>
@@ -26,10 +26,10 @@
     </a>
     <nav class="nav-links" aria-label="Primary">
       <a href="/exhibits">Exhibits</a>
-      <a href="/case">Case file</a>
-      <a href="/hates">150 hates</a>
+      <a href="/case">Cases</a>
+      <a href="/hates">Ledger</a>
       <a href="/people">People</a>
-      <a href="/live" class="nav-live" aria-current="page">Live feed</a>
+      <a href="/live" class="nav-live" aria-current="page">Alerts</a>
       <a href="/desk">Desk</a>
       <a href="/proof">Submit proof</a>
     </nav>
@@ -39,29 +39,47 @@
 
   <main class="page">
     <div class="wrap">
-      <div class="live-status glass">
-        <span class="onair-live"><i></i> LIVE</span>
-        <span id="onair-count">0 on the wire</span>
-        <span class="mono" id="onair-ping">connecting</span>
-        <button class="onair-alert" id="enable-alerts" type="button">Enable alerts</button>
-        <a class="mono" href="/rss.xml">RSS</a>
-      </div>
       <div class="sec-head">
         <div>
-          <div class="kicker">Live</div>
-          <h1>Unfiltered X log</h1>
+          <div class="kicker">Global alerts</div>
+          <h1>What’s on the wire, as it lands.</h1>
         </div>
-        <p>Scraper, RSS, and verified filings. Newest first. This page updates itself.</p>
+        <p>Named world desks and verified X receipts in one channel. Newest at the bottom, like a newsroom chat. Not an unfiltered dump. The livestream in the corner is a newsroom, not an ad.</p>
       </div>
       <div class="clocks" id="clocks">
-        <span data-tz="UTC">UTC --:--</span>
-        <span data-tz="America/New_York">ET --:--</span>
-        <span data-tz="America/Los_Angeles">PT --:--</span>
-        <span data-tz="Europe/London">LT --:--</span>
+        <span data-tz="UTC" data-city="UTC">UTC --:--:--</span>
+        <span data-tz="America/New_York" data-city="ET">ET --:--:--</span>
+        <span data-tz="Europe/London" data-city="London">London --:--:--</span>
+        <span data-tz="Asia/Jerusalem" data-city="Jerusalem">Jerusalem --:--:--</span>
+        <span data-tz="Asia/Tehran" data-city="Tehran">Tehran --:--:--</span>
+        <span data-tz="Asia/Shanghai" data-city="Beijing">Beijing --:--:--</span>
       </div>
-      <div class="feed" id="feed" aria-live="polite"></div>
+      <section class="chat-shell glass" aria-label="Live alerts">
+        <div class="chat-toolbar">
+          <span class="onair-live"><i></i> LIVE</span>
+          <span id="onair-count">0 alerts</span>
+          <span class="mono" id="onair-ping">connecting</span>
+          <button class="chip on" data-chat="all" type="button">All</button>
+          <button class="chip" data-chat="wire" type="button">World</button>
+          <button class="chip" data-chat="x" type="button">X</button>
+          <button class="onair-alert" id="enable-alerts" type="button">Enable alerts</button>
+          <a class="mono" href="/rss.xml">RSS</a>
+        </div>
+        <div class="chat-log" id="chat-log" aria-live="polite"></div>
+      </section>
     </div>
   </main>
+
+  <aside class="world-pip glass" id="world-pip">
+    <header>
+      <span class="onair-live"><i></i> LIVE</span>
+      <span class="mono">World · Al Jazeera English · not an ad</span>
+      <button class="pip-btn" id="pip-toggle" type="button" aria-label="Minimize livestream">–</button>
+    </header>
+    <div class="world-pip-frame">
+      <iframe title="Al Jazeera English live" src="https://www.youtube-nocookie.com/embed/live_stream?channel=UCNye-wNBqNL5YBBIDP2F1cA&amp;autoplay=1&amp;mute=1&amp;rel=0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+    </div>
+  </aside>
 
   <div class="toast" id="toast" hidden></div>
 
@@ -72,7 +90,7 @@
         <span><strong>© FX</strong><em>fx.nyptid.com</em></span>
       </a>
       <nav class="foot-links" aria-label="Footer">
-        <a href="/live">Live</a>
+        <a href="/live">Alerts</a>
         <a href="/desk">Desk</a>
         <a href="/donate">Donate</a>
         <a href="/proof">Proof</a>
@@ -80,6 +98,7 @@
       <p class="byline">by NYPTID Industries Advanced Technologies</p>
     </div>
   </footer>
-  <script src="/assets/js/feed.js?v=10"></script>
+  <script src="/assets/js/world-pip.js?v=13"></script>
+  <script src="/assets/js/alerts.js?v=13"></script>
 </body>
 </html>

@@ -121,13 +121,22 @@
       .join("");
   }
 
-  const allRows = [
+  let allRows = [
     ...(data.hates || []).map((h, i) => ({ n: i + 1, cat: h[0], text: h[1], kind: "hate" })),
-    ...(data.likes || []).map((h, i) => ({ n: i + 1, cat: h[0], text: h[1], kind: "like" }))
+    ...(data.likes || []).map((h, i) => ({ n: i + 1, cat: h[0], text: h[1], kind: "like" })),
+    ...(data.neutrals || []).map((h, i) => ({ n: i + 1, cat: h[0], text: h[1], kind: "neutral" }))
   ];
 
-  let filter = "hate";
+  let filter = "all";
   let query = "";
+  const liveSeen = new Set();
+
+  function label(r) {
+    if (r.live) return "LIVE";
+    if (r.kind === "like") return "LIKE";
+    if (r.kind === "neutral") return "NOTE";
+    return String(r.n).padStart(3, "0");
+  }
 
   function renderLedger() {
     if (!$("#ledger-list")) return;
@@ -136,31 +145,59 @@
         filter === "all" ||
         (filter === "hate" && r.kind === "hate") ||
         (filter === "like" && r.kind === "like") ||
+        (filter === "neutral" && r.kind === "neutral") ||
         r.cat === filter;
       const q = query.trim().toLowerCase();
-      const textOk = !q || r.text.toLowerCase().includes(q) || r.cat.includes(q);
+      const textOk = !q || r.text.toLowerCase().includes(q) || r.cat.includes(q) || r.kind.includes(q);
       return catOk && textOk;
     });
     const hateCount = $("#hate-count");
     const likeCount = $("#like-count");
+    const noteCount = $("#neutral-count");
     const shown = $("#shown-count");
     if (hateCount) hateCount.textContent = String((data.hates || []).length);
     if (likeCount) likeCount.textContent = String((data.likes || []).length);
+    if (noteCount) noteCount.textContent = String((data.neutrals || []).length);
     if (shown) shown.textContent = String(list.length);
     $("#ledger-list").innerHTML = list.length
       ? list
-          .map(
-            (r) => `
-        <article class="reason ${r.kind}">
-          <div class="idx">${r.kind === "like" ? "LIKE" : String(r.n).padStart(3, "0")}</div>
-          <div>
-            <p>${r.text}</p>
-            <span class="tag">${r.kind === "like" ? "why they stay" : r.cat}</span>
-          </div>
-        </article>`
-          )
+          .map((r) => {
+            const p = `<p>${esc(r.text)}</p><span class="tag">${esc(r.live ? "live · " + r.cat : r.kind === "like" ? "why they stay" : r.kind === "neutral" ? "on the record" : r.cat)}</span>`;
+            const inner = r.url
+              ? `<a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${p}</a>`
+              : `<div>${p}</div>`;
+            return `<article class="reason ${r.kind}${r.live ? " live" : ""}"><div class="idx">${label(r)}</div>${inner}</article>`;
+          })
           .join("")
       : `<div class="empty glass">No receipts match that filter.</div>`;
+  }
+
+  async function pollLedger() {
+    if (!$("#ledger-list")) return;
+    try {
+      const res = await fetch("/api/ledger", { cache: "no-store" });
+      const payload = await res.json();
+      let added = 0;
+      (payload.live || []).forEach((row) => {
+        if (!row.id || liveSeen.has(row.id)) return;
+        liveSeen.add(row.id);
+        allRows.unshift({
+          n: 0,
+          cat: row.cat || "world",
+          text: row.text,
+          kind: row.kind || "neutral",
+          url: row.url,
+          live: true
+        });
+        added += 1;
+      });
+      const ping = $("#ledger-ping");
+      if (ping) ping.textContent = `live ${new Date().toISOString().slice(11, 19)} UTC`;
+      if (added) renderLedger();
+    } catch {
+      const ping = $("#ledger-ping");
+      if (ping) ping.textContent = "live reconnect";
+    }
   }
 
   function bindLedger() {
@@ -335,11 +372,70 @@
     });
   }
 
+  function renderCases() {
+    const index = $("#case-index");
+    const open = $("#case-open");
+    if (!index || !open) return;
+    const cases = data.cases || [];
+    index.innerHTML = cases
+      .map(
+        (c) => `
+      <button class="case-card glass" type="button" data-case="${esc(c.id)}">
+        <div class="kicker">${esc(c.id)} · ${esc(c.date)}</div>
+        <h3>${esc(c.title)}</h3>
+        <p>${esc(c.charge)}</p>
+      </button>`
+      )
+      .join("");
+
+    function show(id) {
+      const c = cases.find((x) => x.id === id) || cases[0];
+      if (!c) return;
+      $$(".case-card").forEach((el) => el.setAttribute("aria-current", el.dataset.case === c.id ? "true" : "false"));
+      const people = (c.people || [])
+        .map((h) => `<a class="pill" href="https://x.com/${esc(h)}" target="_blank" rel="noopener noreferrer">@${esc(h)}</a>`)
+        .join("");
+      const links = (c.links || [])
+        .map((l) => `<a class="pill" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.label)}</a>`)
+        .join("");
+      let clock = "";
+      if (c.id === "FX-0904" && (data.timeline || []).length) {
+        clock = `<ol class="tl">${data.timeline
+          .map((t) => {
+            const inner = `<time datetime="${esc(t.t)}">${esc(t.t)}</time><div><h4>${esc(t.title)}</h4><p>${esc(t.body)}</p></div>`;
+            return t.url
+              ? `<li><a class="tl-row" href="${esc(t.url)}" target="_blank" rel="noopener noreferrer">${inner}</a></li>`
+              : `<li><div class="tl-row">${inner}</div></li>`;
+          })
+          .join("")}</ol>`;
+      }
+      open.innerHTML = `
+        <div class="kicker">${esc(c.id)} · ${esc(c.date)} · ${esc(c.status)}</div>
+        <h2>${esc(c.title)}</h2>
+        <p>${esc(c.body)}</p>
+        <div class="case-people">${people}${links}</div>
+        ${clock}`;
+      if (location.hash.replace("#", "") !== c.id) history.replaceState(null, "", `#${c.id}`);
+    }
+
+    index.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-case]");
+      if (!btn) return;
+      show(btn.dataset.case);
+      open.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    window.addEventListener("hashchange", () => show(location.hash.replace("#", "")));
+    show(location.hash.replace("#", "") || cases[0].id);
+  }
+
   renderEvidence();
   renderTimeline();
   renderPeople();
+  renderCases();
   bindLedger();
   renderLedger();
+  pollLedger();
+  if ($("#ledger-list")) setInterval(pollLedger, 8000);
   spotlight();
   counters();
   nav();
