@@ -682,16 +682,44 @@ a.tl-row:hover h4 { color: var(--cyan); }
 /* PEOPLE */
 .people-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 .person {
-  padding: 16px;
+  padding: 18px 18px 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  min-height: 132px;
+  gap: 10px;
+  min-height: 0;
 }
+.person-top {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.person.dossier p { margin: 0; color: var(--mute); font-size: 0.92rem; line-height: 1.45; }
+.reason-dek {
+  margin: 6px 0 0 !important;
+  font-size: 12px;
+  color: var(--mute);
+  line-height: 1.4;
+}
+.chat-dek {
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  color: var(--mute);
+  line-height: 1.4;
+}
+.chat-kind { color: var(--cyan); }
+.case-both {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 18px 0;
+}
+.case-both p { margin: 8px 0 0; color: #c2c8d2; }
 .person:hover { border-color: var(--cyan); }
 .avatar {
   width: 36px; height: 36px;
@@ -1354,7 +1382,7 @@ footer {
 .foot-links a:hover { color: var(--cyan); }
 .nav-cta[aria-current="page"] { box-shadow: 0 0 0 1px var(--cyan); }
 @media (max-width: 900px) {
-  .oil-grid, .wire, .desk-split, .donate-layout, .split.trio, .case-index, .gift-who { grid-template-columns: 1fr; }
+  .oil-grid, .wire, .desk-split, .donate-layout, .split.trio, .case-index, .gift-who, .case-both, #people-grid { grid-template-columns: 1fr; }
   .gift-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .gift-top { flex-direction: column; align-items: flex-start; }
   .donate-band { flex-direction: column; align-items: flex-start; }
@@ -1753,7 +1781,52 @@ footer {
 }
 #stay > .wrap { position: relative; z-index: 1; }
 
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 26px, 0);
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--d, 0ms);
+}
+html.motion body.booted .nav {
+  animation: nav-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes nav-in {
+  from { opacity: 0; transform: translate(-50%, -16px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+html.motion .hero-bg {
+  animation: ken 38s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes ken {
+  from { transform: scale(1.04) translate3d(0, 0, 0); }
+  to { transform: scale(1.12) translate3d(0, -2.2%, 0); }
+}
+html.motion .person,
+html.motion .shot,
+html.motion .case-card,
+html.motion .gift-fund,
+html.motion .proof-card {
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease;
+}
+html.motion .person:hover,
+html.motion .shot:hover,
+html.motion .case-card:hover,
+html.motion .gift-fund:hover,
+html.motion .proof-card:hover {
+  transform: translateY(-4px);
+}
+html.motion-off .reveal { opacity: 1; transform: none; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .marquee-track, .status i, .shot img, .live-dot i, .onair-live i, .nav-live::before, .feed-item.new, .fx-ticker-track, .fx-ticker-tag i { animation: none; transition: none; }
+  .marquee-track, .status i, .shot img, .live-dot i, .onair-live i, .nav-live::before, .feed-item.new, .fx-ticker-track, .fx-ticker-tag i, .hero-bg, .nav { animation: none; transition: none; }
+  .reveal { opacity: 1; transform: none; }
+}
 }

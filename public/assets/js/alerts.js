@@ -12,7 +12,6 @@
   let filter = "all";
   let alertsOn = false;
   let stick = true;
-  let total = 0;
   let timer = 0;
 
   const esc = (s) =>
@@ -34,6 +33,12 @@
     const h = Math.round(m / 60);
     if (h < 48) return `${h}h`;
     return `${Math.round(h / 24)}d`;
+  }
+
+  function clock(iso) {
+    const d = new Date(iso);
+    if (!d.getTime()) return "";
+    return d.toISOString().replace("T", " ").slice(0, 16) + " UTC";
   }
 
   function initials(name) {
@@ -64,14 +69,21 @@
     const kind = item.kind === "x" ? "x" : "wire";
     const who = item.display_name || item.handle || item.source || "wire";
     const href = item.url || item.profile_url || "#";
+    const dek = item.dek || (kind === "x" ? `X · @${item.handle || who}` : `${item.source || "wire"} · named desk`);
+    const when = clock(item.created_at);
     return `
       <a class="chat-row ${kind}${isNew ? " new" : ""}" data-id="${esc(item.id)}" data-kind="${kind}" href="${esc(href)}" target="_blank" rel="noopener noreferrer">
         <div class="chat-av" aria-hidden="true">${esc(initials(who))}</div>
         <div class="chat-body">
-          <div class="chat-meta"><b>${esc(who)}</b><span>${esc(kind === "x" ? "X" : item.source || "wire")}</span></div>
+          <div class="chat-meta">
+            <b>${esc(who)}</b>
+            <span class="chat-kind">${esc(kind === "x" ? "X filing" : "named wire")}</span>
+            ${item.stance && item.stance !== "neutral" ? `<span>${esc(item.stance)}</span>` : ""}
+          </div>
           <p>${esc(item.text || "")}</p>
+          <div class="chat-dek">${esc(dek)}${when ? " · " + esc(when) : ""}</div>
         </div>
-        <time class="chat-time">${esc(ago(item.created_at))}</time>
+        <time class="chat-time">${esc(ago(item.created_at) || "now")}</time>
       </a>`;
   }
 
@@ -82,7 +94,6 @@
   }
 
   function setCount(n) {
-    total = n;
     if (countEl) countEl.textContent = `${n} alerts`;
     document.title = n ? `Alerts · ${n} | FX` : "Alerts | FX";
   }
@@ -108,37 +119,37 @@
     if (stick) log.scrollTop = log.scrollHeight;
   }
 
+  if (!log.querySelector(".chat-row")) {
+    log.innerHTML = `<div class="empty">Pulling named wires…</div>`;
+  }
+
   async function tick() {
     try {
       const res = await fetch("/api/alerts", { cache: "no-store" });
       const data = await res.json();
       const items = (data.items || []).slice().reverse();
-      if (pingEl) pingEl.textContent = "live";
+      if (pingEl) pingEl.textContent = items.length ? "live" : "wire quiet";
       const fresh = [];
       for (const item of items) {
         if (!item.id || seen.has(item.id)) continue;
         seen.add(item.id);
         fresh.push(item);
       }
-      if (!log.children.length && !fresh.length && items.length) {
-        /* first paint used items already marked */
-      }
-      if (!seen.size && !items.length) {
-        log.innerHTML = `<div class="empty">Wire is quiet.</div>`;
-        setCount(0);
-        return;
-      }
       if (fresh.length) {
         log.querySelector(".empty")?.remove();
         const wrap = document.createElement("div");
-        wrap.innerHTML = fresh.map((item) => row(item, Boolean(log.children.length))).join("");
+        wrap.innerHTML = fresh.map((item) => row(item, Boolean(log.querySelector(".chat-row")))).join("");
         while (wrap.firstChild) log.appendChild(wrap.firstChild);
         applyFilter();
         setCount(log.querySelectorAll(".chat-row").length);
         pinBottom();
-        if (log.children.length > fresh.length) showToast(fresh[fresh.length - 1]);
-      } else if (!log.querySelector(".chat-row")) {
-        log.innerHTML = items.map((item) => row(item, false)).join("");
+        if (log.querySelectorAll(".chat-row").length > fresh.length) showToast(fresh[fresh.length - 1]);
+        return;
+      }
+      if (!log.querySelector(".chat-row")) {
+        log.innerHTML = items.length
+          ? items.map((item) => row(item, false)).join("")
+          : `<div class="empty">Wire is quiet. Retrying.</div>`;
         items.forEach((item) => item.id && seen.add(item.id));
         applyFilter();
         setCount(items.length);
@@ -146,6 +157,9 @@
       }
     } catch {
       if (pingEl) pingEl.textContent = "reconnect";
+      if (!log.querySelector(".chat-row")) {
+        log.innerHTML = `<div class="empty">Feed dropped. Retrying the wires.</div>`;
+      }
     }
   }
 
@@ -183,7 +197,7 @@
   function play() {
     if (timer) return;
     tick();
-    timer = setInterval(tick, 3000);
+    timer = setInterval(tick, 4000);
   }
   function pause() {
     clearInterval(timer);

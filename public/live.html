@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/css/fx.css?v=13">
+  <link rel="stylesheet" href="/assets/css/fx.css?v=15">
 </head>
 <body class="inner">
   <div class="noise" aria-hidden="true"></div>
@@ -73,11 +73,12 @@
   <aside class="world-pip glass" id="world-pip">
     <header>
       <span class="onair-live"><i></i> LIVE</span>
-      <span class="mono">World · Al Jazeera English · not an ad</span>
+      <span class="mono" id="pip-label">World · connecting</span>
+      <button class="pip-btn" id="pip-next" type="button" aria-label="Next livestream">↻</button>
       <button class="pip-btn" id="pip-toggle" type="button" aria-label="Minimize livestream">–</button>
     </header>
     <div class="world-pip-frame">
-      <iframe title="Al Jazeera English live" src="https://www.youtube-nocookie.com/embed/live_stream?channel=UCNye-wNBqNL5YBBIDP2F1cA&amp;autoplay=1&amp;mute=1&amp;rel=0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+      <iframe id="pip-frame" title="World live" src="about:blank" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
     </div>
   </aside>
 
@@ -98,7 +99,8 @@
       <p class="byline">by NYPTID Industries Advanced Technologies</p>
     </div>
   </footer>
-  <script src="/assets/js/world-pip.js?v=13"></script>
-  <script src="/assets/js/alerts.js?v=13"></script>
+  <script src="/assets/js/world-pip.js?v=15"></script>
+  <script src="/assets/js/alerts.js?v=15"></script>
+  <script src="/assets/js/motion.js?v=15"></script>
 </body>
 </html>

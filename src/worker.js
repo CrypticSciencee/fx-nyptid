@@ -134,12 +134,34 @@ const mem = {
   world: { exp: 0, data: null }
 };
 
-async function remember(slot, ttl, fn) {
+async function remember(env, slot, ttl, fn) {
   const now = Date.now();
   if (mem[slot].data && now < mem[slot].exp) return mem[slot].data;
+  if (env?.PROOF) {
+    try {
+      const raw = await env.PROOF.get(`cache:${slot}`);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const stamp = Date.parse(parsed.generated_at || parsed.world_at || 0);
+        if (Number.isFinite(stamp) && now - stamp < ttl) {
+          mem[slot] = { exp: now + Math.max(1000, ttl - (now - stamp)), data: parsed };
+          return parsed;
+        }
+      }
+    } catch {
+      /* fall through */
+    }
+  }
   try {
     const data = await fn();
     mem[slot] = { exp: now + ttl, data };
+    if (env?.PROOF) {
+      try {
+        await env.PROOF.put(`cache:${slot}`, JSON.stringify(data), { expirationTtl: 180 });
+      } catch {
+        /* ignore kv */
+      }
+    }
     return data;
   } catch (err) {
     if (mem[slot].data) return mem[slot].data;
@@ -295,10 +317,12 @@ async function loadWorld() {
       if (!key || seen.has(key)) continue;
       seen.add(key);
       const parsed = Date.parse(date);
+      const dek = clean(rssTag(block, "description"), 220);
       items.push({
         source,
         title,
         url,
+        dek,
         published: Number.isFinite(parsed) ? new Date(parsed).toISOString() : ""
       });
     }
@@ -307,11 +331,7 @@ async function loadWorld() {
   return { items: items.slice(0, 40), generated_at: new Date().toISOString() };
 }
 
-async function loadAlerts(env) {
-  const [world, feed] = await Promise.all([
-    remember("world", 20000, loadWorld).catch(() => ({ items: [], generated_at: new Date().toISOString() })),
-    readList(env, "feed")
-  ]);
+function packAlerts(world, feed) {
   const items = [];
   for (const row of world.items || []) {
     items.push({
@@ -321,6 +341,7 @@ async function loadAlerts(env) {
       handle: row.source,
       display_name: row.source,
       text: row.title,
+      dek: row.dek || "",
       url: row.url,
       created_at: row.published || world.generated_at,
       stance: "neutral"
@@ -334,6 +355,7 @@ async function loadAlerts(env) {
       handle: row.handle,
       display_name: row.display_name || row.handle,
       text: row.text,
+      dek: row.handle ? `Verified X filing · @${row.handle}` : "Verified X filing",
       url: row.url,
       profile_url: row.profile_url,
       created_at: row.created_at,
@@ -342,6 +364,30 @@ async function loadAlerts(env) {
   }
   items.sort((a, b) => Date.parse(b.created_at || 0) - Date.parse(a.created_at || 0));
   return { items: items.slice(0, 80), generated_at: new Date().toISOString() };
+}
+
+async function loadAlerts(env) {
+  const [world, feed] = await Promise.all([
+    remember(env, "world", 20000, loadWorld).catch(() => ({ items: [], generated_at: new Date().toISOString() })),
+    readList(env, "feed")
+  ]);
+  return packAlerts(world, feed);
+}
+
+async function refreshDesk(env) {
+  const oil = await loadOil().catch((err) => ({ error: "Oil quotes unavailable.", detail: String(err), generated_at: new Date().toISOString() }));
+  const world = await loadWorld().catch(() => ({ items: [], generated_at: new Date().toISOString() }));
+  mem.oil = { exp: Date.now() + 30000, data: oil };
+  mem.world = { exp: Date.now() + 30000, data: world };
+  try {
+    await env.PROOF.put("cache:oil", JSON.stringify(oil), { expirationTtl: 180 });
+    await env.PROOF.put("cache:world", JSON.stringify(world), { expirationTtl: 180 });
+    const alerts = packAlerts(world, await readList(env, "feed"));
+    await env.PROOF.put("cache:alerts", JSON.stringify(alerts), { expirationTtl: 180 });
+  } catch {
+    /* kv optional */
+  }
+  return { oil: !oil.error, world: (world.items || []).length };
 }
 
 function stripeCheckout(base, pledge) {
@@ -435,6 +481,9 @@ async function ingestStatus(env, statusUrl, source, extra = {}, opts = {}) {
 }
 
 export default {
+  async scheduled(_event, env) {
+    await refreshDesk(env);
+  },
   async fetch(request, env) {
     const url = new URL(request.url);
 
@@ -499,7 +548,7 @@ export default {
 
     if (url.pathname === "/api/oil" && request.method === "GET") {
       try {
-        return json(await remember("oil", 20000, loadOil));
+        return json(await remember(env, "oil", 20000, loadOil));
       } catch (err) {
         return json({ error: "Oil quotes unavailable.", detail: String(err) }, 502);
       }
@@ -507,7 +556,7 @@ export default {
 
     if (url.pathname === "/api/world" && request.method === "GET") {
       try {
-        return json(await remember("world", 45000, loadWorld));
+        return json(await remember(env, "world", 45000, loadWorld));
       } catch (err) {
         return json({ error: "Wire unavailable.", detail: String(err), items: [] }, 502);
       }
@@ -515,7 +564,21 @@ export default {
 
     if (url.pathname === "/api/alerts" && request.method === "GET") {
       try {
-        return json(await loadAlerts(env));
+        const raw = await env.PROOF.get("cache:alerts");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const age = Date.now() - Date.parse(parsed.generated_at || 0);
+          if (Number.isFinite(age) && age < 45000 && (parsed.items || []).length) {
+            return json(parsed);
+          }
+        }
+        const payload = await loadAlerts(env);
+        try {
+          await env.PROOF.put("cache:alerts", JSON.stringify(payload), { expirationTtl: 180 });
+        } catch {
+          /* ignore */
+        }
+        return json(payload);
       } catch (err) {
         return json({ error: "Alerts unavailable.", detail: String(err), items: [] }, 502);
       }
@@ -541,8 +604,8 @@ export default {
 
     if (url.pathname === "/api/desk" && request.method === "GET") {
       const [oilSettled, worldSettled, feed, alerts] = await Promise.all([
-        remember("oil", 20000, loadOil).catch((err) => ({ error: "Oil quotes unavailable.", detail: String(err) })),
-        remember("world", 20000, loadWorld).catch(() => ({ items: [], generated_at: new Date().toISOString() })),
+        remember(env, "oil", 20000, loadOil).catch((err) => ({ error: "Oil quotes unavailable.", detail: String(err) })),
+        remember(env, "world", 20000, loadWorld).catch(() => ({ items: [], generated_at: new Date().toISOString() })),
         readList(env, "feed"),
         loadAlerts(env).catch(() => ({ items: [], generated_at: new Date().toISOString() }))
       ]);

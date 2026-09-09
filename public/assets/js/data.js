@@ -4,22 +4,22 @@ window.FX = {
   updated: "2026-09-08",
 
   people: [
-    { name: "Parody Jeff", handle: "Parodyjeffx", role: "Suspended satire account · 182.6K", url: "https://x.com/Parodyjeffx", status: "suspended" },
-    { name: "Rabbi Jeff", handle: "RabbiJeffx", role: "Successor parody account", url: "https://x.com/RabbiJeffx", status: "live" },
-    { name: "Thomas Massie", handle: "RepThomasMassie", role: "U.S. Representative, KY-4", url: "https://x.com/RepThomasMassie", status: "live" },
-    { name: "Elon Musk", handle: "elonmusk", role: "Owner · “unless it’s illegal”", url: "https://x.com/elonmusk", status: "live" },
-    { name: "Allegra Jacchia", handle: "allegrajacchia", role: "X leadership, tagged in appeals", url: "https://x.com/allegrajacchia", status: "live" },
-    { name: "X Safety", handle: "Safety", role: "Trust & safety surface", url: "https://x.com/Safety", status: "live" },
-    { name: "X Support", handle: "Support", role: "The black hole", url: "https://x.com/Support", status: "live" },
-    { name: "X", handle: "X", role: "The platform", url: "https://x.com/X", status: "live" },
-    { name: "X Premium", handle: "premium", role: "Paywall for oxygen", url: "https://x.com/premium", status: "live" },
-    { name: "GenXGirl", handle: "GenXGirl1994", role: "209K-post count receipt", url: "https://x.com/GenXGirl1994", status: "live" },
-    { name: "IanMalcolm84", handle: "IanMalcolm84", role: "Headline tracker", url: "https://x.com/IanMalcolm84", status: "live" },
-    { name: "Mr. Nobody", handle: "MmisterNobody", role: "Unban-or-never-talk-free-speech", url: "https://x.com/MmisterNobody", status: "live" },
-    { name: "THE REAL WORLD", handle: "TRW_global", role: "Andrew Tate funnel on For You", url: "https://x.com/TRW_global", status: "live" },
-    { name: "FLAT EARTH LIBRARY", handle: "FELibrary_", role: "Verified local-sun cosmology", url: "https://x.com/FELibrary_", status: "live" },
-    { name: "Janice Will", handle: "JaniceWill47400", role: "In the Massie reply chain", url: "https://x.com/JaniceWill47400", status: "live" },
-    { name: "Grok", handle: "grok", role: "House AI · screenshot at your own risk", url: "https://x.com/grok", status: "live" }
+    { name: "Parody Jeff", handle: "Parodyjeffx", role: "Suspended satire · 182.6K", url: "https://x.com/Parodyjeffx", status: "suspended", kind: "operator", files: ["FX-0904", "FX-0903", "FX-0724"], exhibits: ["01", "04", "05"], bio: "Premium parody account. Months of loaded questions to Grok. Early September 2026 the profile became a policy page. Street story: the Gaza screenshot. Company-adjacent story: authenticity / alts. Both sit in FX-0904." },
+    { name: "Rabbi Jeff", handle: "RabbiJeffx", role: "Successor parody · the encore", url: "https://x.com/RabbiJeffx", status: "live", kind: "operator", files: ["FX-0904", "FX-0905", "FX-0906", "FX-0908"], exhibits: ["01", "05", "06", "07", "08"], bio: "The operator came back under a new handle while the original is a tombstone. X’s own rules say suspended users don’t get a sequel. The sequel is verified. Filed the appeal, the Massie thank-you, the 350k-post campaign." },
+    { name: "Thomas Massie", handle: "RepThomasMassie", role: "U.S. Representative, KY-4", url: "https://x.com/RepThomasMassie", status: "live", kind: "congress", files: ["FX-0908", "FX-0904"], exhibits: ["01", "04"], bio: "Asked the owner to review the block. Did not agree with everything the account said. Did not think it deserved a ban. Nearly 200k followers, he noted. Public reply from the owner: none. That silence is the file." },
+    { name: "Elon Musk", handle: "elonmusk", role: "Owner · sysop and main character", url: "https://x.com/elonmusk", status: "live", kind: "owner", files: ["FX-0724", "FX-0908", "FX-0904", "FX-ADS", "FX-BOTS"], exhibits: ["01", "08"], bio: "Wrote the slogan on 27 Jul 2024. Replies to almost everyone. Did not reply here. Tesla, SpaceX, xAI, and X share an owner. They do not share a newsroom. The feed ranks him first on purpose." },
+    { name: "Allegra Jacchia", handle: "allegrajacchia", role: "X leadership · tagged in appeals", url: "https://x.com/allegrajacchia", status: "live", kind: "company", files: ["FX-0906"], exhibits: ["06", "07"], bio: "Named in the 350k-post campaign and the headlines-silence chain. Public product voice. The tape shows the tag. The tape does not show a public answer." },
+    { name: "X Safety", handle: "Safety", role: "Trust & safety surface", url: "https://x.com/Safety", status: "live", kind: "company", files: ["FX-0905", "FX-SAFETY", "FX-0724"], exhibits: ["08"], bio: "The report button, the appeal letter, the tombstone chrome. Headcount is a number. What it can catch is a function of that number. GenXGirl counted 209,000 posts asking this handle to move." },
+    { name: "X Support", handle: "Support", role: "Tickets that become ghosts", url: "https://x.com/Support", status: "live", kind: "company", files: ["FX-0905", "FX-0906"], exhibits: ["04", "06"], bio: "The black hole with a logo. Tagged in the unban campaign and the appeal. A sitting product, not a person. Still a door on this wall." },
+    { name: "X", handle: "X", role: "The platform", url: "https://x.com/X", status: "live", kind: "company", files: ["FX-API", "FX-PREMIUM", "FX-ADS"], exhibits: ["04"], bio: "The brand that ate the bird. Official account for a single-owner product. Not a town square in the civic sense. A server with a ranking function and a sales deck." },
+    { name: "X Premium", handle: "premium", role: "The check is a card", url: "https://x.com/premium", status: "live", kind: "company", files: ["FX-PREMIUM"], exhibits: ["04"], bio: "Paid tools are real: longer video, edit, fewer caps. Paid ranking is also real. A satire account with 182K and Premium still became a draft. The invoice did not." },
+    { name: "GenXGirl", handle: "GenXGirl1994", role: "209K-post count · slogan vs body", url: "https://x.com/GenXGirl1994", status: "live", kind: "witness", files: ["FX-0724", "FX-0904"], exhibits: ["08"], bio: "Posted the count: 209,000 posts asking for reinstatement, Safety still holding the tombstone. Put Elon’s 2024 slogan next to the 2026 body. That juxtaposition is exhibit 08." },
+    { name: "IanMalcolm84", handle: "IanMalcolm84", role: "Headline tracker", url: "https://x.com/IanMalcolm84", status: "live", kind: "witness", files: ["FX-0906"], exhibits: ["07"], bio: "Two leading headlines included the suspension. Zero comments from the man who never stops commenting. Asked if that was telling. FX files the question, not a verdict." },
+    { name: "Mr. Nobody", handle: "MmisterNobody", role: "Unban or never talk free speech", url: "https://x.com/MmisterNobody", status: "live", kind: "witness", files: ["FX-0904"], exhibits: ["04"], bio: "Tagged the owner, Premium, the brand, and Support. One sentence: unban the satire account or stop selling the slogan. The post is still up. The tombstone is still up." },
+    { name: "THE REAL WORLD", handle: "TRW_global", role: "Andrew Tate funnel on For You", url: "https://x.com/TRW_global", status: "live", kind: "feed", files: ["FX-0901", "FX-ADS"], exhibits: ["02"], bio: "Verified. On the main stage. “You’re either rich, or you don’t matter.” Not a parody. An ad. Case FX-0901 is the ranking surface, not a secret network." },
+    { name: "FLAT EARTH LIBRARY", handle: "FELibrary_", role: "Verified local-sun cosmology", url: "https://x.com/FELibrary_", status: "live", kind: "feed", files: ["FX-0907"], exhibits: ["03"], bio: "The sun is 93 million miles away. This account ships the opposite, with a check, and tens of thousands of views. Community Notes exists. The algorithm still likes a spectacle." },
+    { name: "Janice Will", handle: "JaniceWill47400", role: "Massie reply chain", url: "https://x.com/JaniceWill47400", status: "live", kind: "witness", files: ["FX-0908"], exhibits: ["01"], bio: "Present in the Massie / Rabbi Jeff chain under the tombstone screenshot. A human in the thread. The door is the profile." },
+    { name: "Grok", handle: "grok", role: "House AI · screenshot at your own risk", url: "https://x.com/grok", status: "live", kind: "company", files: ["FX-0903", "FX-GROK"], exhibits: ["05"], bio: "xAI’s model inside X. Output is the company’s. A screenshot of it is the user’s. Gaza analysis became a nuclear screenshot. Imagine became a deepfake factory, then a paywall. The house dealer is also the house." }
   ],
 
   evidence: [
@@ -554,5 +554,99 @@ window.FX = {
       links: [],
       body: "“Go fuck yourself” to advertisers, then a sales deck, then a discount. A $3.75B impairment primarily related to the Twitter brand. The bird was killed and billed. What still buys the slot is what you see."
     }
-  ]
+  ],
+
+  cats: {
+    speech: "Slogan versus the enforcement log. Both are public.",
+    reach: "Ranking, For You, Following, and who gets buried.",
+    bots: "Inauthentic accounts, checks as cards, farms that follow money.",
+    ads: "What still buys the slot after the exodus.",
+    grok: "House model. Output is the company. Screenshot is the user.",
+    safety: "Headcount, kids, CSAM backlog, papers not vibes.",
+    product: "API, clients, search, the official door.",
+    elon: "Owner as algorithm and main character.",
+    culture: "Rage, funnels, context collapse as a service.",
+    money: "Premium, payouts, invoices that outlive the posts.",
+    notes: "Community Notes: crowd, not a court.",
+    news: "Breaking still happens here. So do rumors with checks.",
+    access: "Officials, impersonators, and the old meaning of a check.",
+    global: "Multilingual firehose. The remaining civic argument.",
+    habit: "The graph is here. Inertia counts.",
+    live: "Live event pulse.",
+    x: "Verified X filing on this wall.",
+    world: "Named wire. Not FX commentary."
+  },
+
+  dossiers: {
+    "FX-0904": {
+      street: "Grok’s Gaza analysis was screenshotted. Hours later the satire account was a policy page. The slogan said unless it’s illegal it stays up.",
+      company: "Grok, asked why, pointed at ban evasion / linked alts under authenticity rules, “separate from any content or AI exchanges.” Advocacy groups published their own brief.",
+      why: "One handle is enough to put the slogan and the body on the same glass."
+    },
+    "FX-0908": {
+      street: "A sitting member of Congress asked the owner to look. The owner looks at almost everything else.",
+      company: "No public product statement. No review note. The tombstone chrome did not change.",
+      why: "Silence from a man who never stops commenting is data."
+    },
+    "FX-0905": {
+      street: "The appeal is supposed to be a human process. It came back as a paragraph with a logo.",
+      company: "“An overturn of our original decision is not warranted.” That is a complete sentence at X.",
+      why: "Process failure is not a legal finding. It is still a file."
+    },
+    "FX-0906": {
+      street: "350,000+ posts. Headlines modules. Three days of trending.",
+      company: "The company is a mute button with a valuation. Tags hit owner, leadership, Support. Public reply: vacuum.",
+      why: "Volume is not a verdict. Neither is silence. Both are on the tape."
+    },
+    "FX-0903": {
+      street: "The house AI said the word. The user shipped the screenshot. The account died.",
+      company: "Authenticity / alt-account rules, separate from content — that is the company-adjacent sentence.",
+      why: "FX records both sentences. It does not pick a ministry."
+    },
+    "FX-0901": {
+      street: "The For You feed will sell you a cult before it shows you the people you followed.",
+      company: "A verified advertiser on the ranking surface. Not a bug. Inventory.",
+      why: "People stay for the firehose. This is what the firehose also is."
+    },
+    "FX-0907": {
+      street: "Verified account: the sun is local. Tens of thousands of views.",
+      company: "A check is a payment state. Community Notes is optional and late.",
+      why: "Cosmology and a credit card should not share a badge. They do."
+    },
+    "FX-0724": {
+      street: "The line will be screenshot forever. Then the body arrived in September 2026.",
+      company: "Marketing is allowed to be a slogan. Enforcement is allowed to have exceptions.",
+      why: "Putting them on the same page is the job."
+    },
+    "FX-GROK": {
+      street: "Non-consensual sexual deepfakes at industrial scale, including depictions of children per CCDH.",
+      company: "Then generation was paywalled. Harm, now with a SKU. EU, Dutch, French paper.",
+      why: "FX is not the regulator. It is the clipping service."
+    },
+    "FX-BOTS": {
+      street: "He bought the company to defeat the bots. The bots sent a fruit basket.",
+      company: "PLOS One: inauthentic activity was not reduced. Filings hedge for “bots or similar.”",
+      why: "The census of the town square is in the paper, not the keynote."
+    },
+    "FX-API": {
+      street: "Researchers, archivists, alt clients — collateral.",
+      company: "API priced to death. Official apps are the remaining door, which is also the ad product.",
+      why: "A square that locks the side doors is a smaller square."
+    },
+    "FX-PREMIUM": {
+      street: "Pay-to-exist. Replies without the card go under a trapdoor.",
+      company: "Paid tools are real. Paid ranking is real. Premium did not buy due process for 182K satire.",
+      why: "The check used to mean a person. Now it means a card."
+    },
+    "FX-SAFETY": {
+      street: "Kids, CSAM backlog, hate-speech papers, simulated 13-year-old accounts in For You.",
+      company: "Trust & safety headcount fell. Yaccarino left via tweet. Remaining staff are a garden hose.",
+      why: "That is a paper, not a vibe."
+    },
+    "FX-ADS": {
+      street: "“Go fuck yourself” to advertisers. Then a sales deck. Then a discount.",
+      company: "$3.75B impairment primarily related to the Twitter brand. Leftover inventory is funnels.",
+      why: "What still buys the slot is what you see."
+    }
+  }
 };

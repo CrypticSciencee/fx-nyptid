@@ -108,16 +108,28 @@
     const el = $("#people-grid");
     if (!el) return;
     el.innerHTML = data.people
-      .map(
-        (p) => `
-      <a class="person glass" href="${p.url}" target="_blank" rel="noopener noreferrer">
-        <div class="avatar" aria-hidden="true">${initials(p.name)}</div>
-        <strong>${p.name}</strong>
-        <span>@${p.handle}</span>
-        <em>${p.role}</em>
-        <div class="badge ${p.status === "suspended" ? "down" : ""}">${p.status === "suspended" ? "Account suspended" : "Open profile"}</div>
-      </a>`
-      )
+      .map((p) => {
+        const files = (p.files || [])
+          .map((id) => `<a class="pill ghost" href="/case#${esc(id)}">${esc(id)}</a>`)
+          .join("");
+        const shots = (p.exhibits || [])
+          .map((id) => `<a class="pill ghost" href="/exhibits">Ex ${esc(id)}</a>`)
+          .join("");
+        return `
+      <article class="person glass dossier">
+        <div class="person-top">
+          <div class="avatar" aria-hidden="true">${initials(p.name)}</div>
+          <div>
+            <strong>${esc(p.name)}</strong>
+            <span>@${esc(p.handle)}</span>
+            <em>${esc(p.kind || "on the tape")} · ${esc(p.role)}</em>
+          </div>
+        </div>
+        <p>${esc(p.bio || p.role)}</p>
+        <div class="pills">${files}${shots}<a class="pill" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">Open profile</a></div>
+        <div class="badge ${p.status === "suspended" ? "down" : ""}">${p.status === "suspended" ? "Account suspended" : "Live profile"}</div>
+      </article>`;
+      })
       .join("");
   }
 
@@ -162,7 +174,9 @@
     $("#ledger-list").innerHTML = list.length
       ? list
           .map((r) => {
-            const p = `<p>${esc(r.text)}</p><span class="tag">${esc(r.live ? "live · " + r.cat : r.kind === "like" ? "why they stay" : r.kind === "neutral" ? "on the record" : r.cat)}</span>`;
+            const catNote = (data.cats && data.cats[r.cat]) || "";
+            const tag = r.live ? `live · ${r.cat}` : r.kind === "like" ? "why they stay" : r.kind === "neutral" ? "on the record" : r.cat;
+            const p = `<p>${esc(r.text)}</p>${catNote ? `<p class="reason-dek">${esc(catNote)}</p>` : ""}<span class="tag">${esc(tag)}</span>`;
             const inner = r.url
               ? `<a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${p}</a>`
               : `<div>${p}</div>`;
@@ -409,11 +423,24 @@
           })
           .join("")}</ol>`;
       }
+      const doss = (data.dossiers && data.dossiers[c.id]) || {};
+      const shots = (c.exhibits || [])
+        .map((id) => `<a class="pill ghost" href="/exhibits">Exhibit ${esc(id)}</a>`)
+        .join("");
+      const both =
+        doss.street || doss.company
+          ? `<div class="case-both">
+              ${doss.street ? `<div><div class="kicker">Street story</div><p>${esc(doss.street)}</p></div>` : ""}
+              ${doss.company ? `<div><div class="kicker">Company-adjacent</div><p>${esc(doss.company)}</p></div>` : ""}
+            </div>`
+          : "";
       open.innerHTML = `
         <div class="kicker">${esc(c.id)} · ${esc(c.date)} · ${esc(c.status)}</div>
         <h2>${esc(c.title)}</h2>
+        ${doss.why ? `<p class="lede">${esc(doss.why)}</p>` : ""}
+        ${both}
         <p>${esc(c.body)}</p>
-        <div class="case-people">${people}${links}</div>
+        <div class="case-people">${people}${links}${shots}</div>
         ${clock}`;
       if (location.hash.replace("#", "") !== c.id) history.replaceState(null, "", `#${c.id}`);
     }
