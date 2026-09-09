@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/css/fx.css?v=17">
+  <link rel="stylesheet" href="/assets/css/fx.css?v=19">
 </head>
 <body class="inner">
   <div class="fx-wire" id="fx-wire" role="region" aria-label="Live global alerts">
@@ -22,6 +22,12 @@
     <div class="fx-wire-view">
       <div class="fx-wire-track" id="fx-wire-track">Connecting to the wire…</div>
     </div>
+  </div>
+  <div class="stage" aria-hidden="true">
+    <video class="stage-film" autoplay muted loop playsinline poster="/assets/bg/cathedral.jpg">
+      <source src="/assets/bg/cathedral.mp4" type="video/mp4">
+    </video>
+    <div class="stage-veil"></div>
   </div>
   <div class="noise" aria-hidden="true"></div>
   <header class="nav glass" id="nav">
@@ -90,7 +96,7 @@
       }
     })();
   </script>
-  <script src="/assets/js/motion.js?v=17"></script>
+  <script src="/assets/js/motion.js?v=19"></script>
   <script src="/assets/js/wire.js?v=16"></script>
 </body>
 </html>

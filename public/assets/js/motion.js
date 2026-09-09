@@ -1,11 +1,25 @@
 (() => {
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   document.documentElement.classList.add("motion");
+  const films = [...document.querySelectorAll(".stage-film")];
   if (reduce) {
     document.documentElement.classList.add("motion-off");
     document.body.classList.add("booted");
+    films.forEach((v) => {
+      v.pause();
+      v.removeAttribute("autoplay");
+    });
     return;
   }
+  films.forEach((v) => {
+    v.muted = true;
+    const play = () => v.play().catch(() => {});
+    play();
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) v.pause();
+      else play();
+    });
+  });
 
   function splitWordmark() {
     const el = document.querySelector(".wordmark");

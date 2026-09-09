@@ -314,14 +314,41 @@ h3 { font-size: 1.35rem; letter-spacing: -0.03em; }
   padding: calc(var(--nav-h) + var(--wire-h) + 40px) 0 48px;
 }
 
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.stage-film {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: contrast(1.08) saturate(1.08);
+  transform: scale(1.04);
+}
+.stage-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, rgba(5,6,10,1) 0%, rgba(5,6,10,.52) 38%, rgba(5,6,10,.18) 62%, rgba(5,6,10,.38) 100%),
+    radial-gradient(60% 50% at 70% 40%, rgba(126,240,255,.1), transparent 55%);
+}
+body.inner .stage-veil {
+  background: linear-gradient(to bottom, rgba(5,6,10,.7) 0%, rgba(5,6,10,.86) 42%, rgba(5,6,10,.94) 100%);
+}
+.page,
+footer {
+  position: relative;
+  z-index: 1;
+}
+
 .hero-bg {
   position: absolute;
   inset: 0;
   z-index: -2;
-  background:
-    url("../bg/hero.jpg") center/cover no-repeat;
-  transform: scale(1.04);
-  filter: contrast(1.08) saturate(1.05);
+  background: transparent;
 }
 
 .hero-bg::after {
@@ -510,10 +537,7 @@ body.inner .sec-head h1 {
 .sec-head p { margin: 0; color: var(--mute); max-width: 52ch; }
 
 .bg-alt {
-  background:
-    linear-gradient(to bottom, transparent, rgba(0,0,0,.35)),
-    url("../bg/cathedral.jpg") center/cover no-repeat;
-  background-attachment: fixed;
+  background: transparent;
 }
 .bg-alt::before {
   content: "";
@@ -523,7 +547,7 @@ body.inner .sec-head h1 {
 }
 
 .bg-shards {
-  background: url("../bg/shards.jpg") center/cover no-repeat;
+  background: transparent;
 }
 .bg-shards::before {
   content: "";
@@ -1839,7 +1863,7 @@ footer {
 #stay {
   position: relative;
   isolation: isolate;
-  background: url("../bg/altar.jpg") center/cover no-repeat;
+  background: transparent;
 }
 #stay::before {
   content: "";
@@ -1876,13 +1900,12 @@ html.motion body.booted .nav {
   from { opacity: 0; transform: translate(-50%, -22px); }
   to { opacity: 1; transform: translate(-50%, 0); }
 }
-html.motion .hero-bg {
-  animation: hero-settle 2.6s cubic-bezier(0.22, 1, 0.36, 1) both;
-  will-change: transform;
+html.motion .stage-film {
+  animation: film-breathe 28s ease-in-out infinite alternate;
 }
-html.motion .hero-bg.settled {
-  animation: none;
-  transform: scale(1.06) translate3d(0, var(--py, 0px), 0);
+@keyframes film-breathe {
+  from { transform: scale(1.04); }
+  to { transform: scale(1.1); }
 }
 @keyframes hero-settle {
   from { transform: scale(1.18) translate3d(0, 0, 0); filter: blur(10px) contrast(1.08); }
@@ -1974,7 +1997,7 @@ html.motion-off .hero-card { opacity: 1; transform: none; animation: none; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .marquee-track, .status i, .shot img, .live-dot i, .onair-live i, .nav-live::before, .feed-item.new, .fx-ticker-track, .fx-ticker-tag i, .fx-wire-track, .fx-wire-tag i, .hero-bg, .nav, .fx-wire, .wordmark .char, .hero-copy .kicker, .hero-copy .lede, .hero-actions, .hero-card { animation: none; transition: none; }
+  .marquee-track, .status i, .shot img, .live-dot i, .onair-live i, .nav-live::before, .feed-item.new, .fx-ticker-track, .fx-ticker-tag i, .fx-wire-track, .fx-wire-tag i, .hero-bg, .nav, .fx-wire, .wordmark .char, .hero-copy .kicker, .hero-copy .lede, .hero-actions, .hero-card, .stage-film { animation: none; transition: none; }
   .reveal, .wordmark .char, .hero-copy .kicker, .hero-copy .lede, .hero-actions, .hero-card { opacity: 1; transform: none; }
 }
 }
