@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Desk | FX</title>
+  <meta name="description" content="Live world desk: oil, Hormuz, clocks, breaking wire.">
+  <link rel="canonical" href="https://fx.nyptid.com/desk">
+  <meta name="theme-color" content="#05060a">
+  <meta property="og:title" content="Desk | FX">
+  <meta property="og:url" content="https://fx.nyptid.com/desk">
+  <meta property="og:image" content="https://fx.nyptid.com/assets/bg/hero.jpg">
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/fx.css?v=11">
+</head>
+<body class="inner">
+  <div class="noise" aria-hidden="true"></div>
+  <header class="nav glass" id="nav">
+    <a class="brand" href="/">
+      <img class="brand-mark" src="/assets/icons/logo.svg" width="28" height="28" alt="">
+      <span>FX</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="/exhibits">Exhibits</a>
+      <a href="/case">Case file</a>
+      <a href="/hates">150 hates</a>
+      <a href="/people">People</a>
+      <a href="/live" class="nav-live">Live feed</a>
+      <a href="/desk" aria-current="page">Desk</a>
+      <a href="/proof">Submit proof</a>
+    </nav>
+    <a class="nav-cta" href="/live">Live feed</a>
+    <button class="burger" id="burger" type="button" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </header>
+
+  <div class="breaking-inline desk-break" aria-hidden="true">
+    <span class="breaking-tag">BREAKING</span>
+    <div class="breaking-track" id="breaking-track">Loading wire…</div>
+  </div>
+
+  <main class="page">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <div class="kicker">World desk</div>
+          <h1>Live oil, Hormuz, and the wire.</h1>
+        </div>
+        <p>Same live-desk pattern as TheOSSreport: clocks, crude quotes, a blockade board, and an unfiltered headline rail. Refreshes itself.</p>
+      </div>
+
+      <div class="clocks" id="clocks">
+        <span data-tz="Asia/Jerusalem">Jerusalem --:--</span>
+        <span data-tz="Asia/Tehran">Tehran --:--</span>
+        <span data-tz="America/New_York">Washington --:--</span>
+        <span data-tz="Europe/Moscow">Moscow --:--</span>
+        <span data-tz="Asia/Shanghai">Beijing --:--</span>
+        <span data-tz="America/Los_Angeles">San Francisco --:--</span>
+      </div>
+      <p class="mono" id="desk-stamp" style="margin:0 0 22px;color:var(--mute)">Last refresh: —</p>
+
+      <div class="oil-grid">
+        <article class="proof-card glass">
+          <div class="kicker">Brent crude · BZ=F</div>
+          <p class="oil-price" id="brent-price">—</p>
+          <span class="oil-chg" id="brent-chg">global benchmark</span>
+        </article>
+        <article class="proof-card glass">
+          <div class="kicker">WTI crude · CL=F</div>
+          <p class="oil-price" id="wti-price">—</p>
+          <span class="oil-chg" id="wti-chg">US benchmark</span>
+        </article>
+        <article class="proof-card glass">
+          <div class="kicker">Hormuz</div>
+          <p class="oil-price" id="hormuz-day">Day —</p>
+          <span class="oil-chg">Partially blocked · ~5 transits/day vs 140 pre-war</span>
+        </article>
+        <article class="proof-card glass">
+          <div class="kicker">Barrels blocked / day</div>
+          <p class="oil-price">~5M</p>
+          <span class="oil-chg">~20% of seaborne crude</span>
+        </article>
+      </div>
+
+      <div class="tv-wrap glass">
+        <div class="kicker">Market view</div>
+        <iframe title="Brent crude chart" src="https://s.tradingview.com/widgetembed/?frameElementId=tv&amp;symbol=TVC%3AUKOIL&amp;interval=60&amp;hidesidetoolbar=1&amp;symboledit=1&amp;saveimage=0&amp;toolbarbg=05060a&amp;studies=%5B%5D&amp;theme=dark&amp;style=1&amp;timezone=Etc%2FUTC&amp;withdateranges=1&amp;hideideas=1" loading="lazy"></iframe>
+      </div>
+
+      <div class="sec-head" style="margin-top:36px">
+        <div>
+          <div class="kicker">Wire</div>
+          <h2>World headlines</h2>
+        </div>
+        <p>BBC, Al Jazeera, energy desk. Unfiltered. Click through to the source.</p>
+      </div>
+      <div class="wire" id="wire"></div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <a class="foot-brand" href="/">
+        <img src="/assets/icons/logo.svg" width="36" height="36" alt="">
+        <span><strong>© FX</strong><em>fx.nyptid.com</em></span>
+      </a>
+      <p class="byline">by NYPTID Industries Advanced Technologies</p>
+    </div>
+  </footer>
+  <script src="/assets/js/desk.js?v=11"></script>
+</body>
+</html>

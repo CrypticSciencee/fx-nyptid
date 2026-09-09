@@ -995,6 +995,48 @@ footer {
   box-shadow: 0 30px 80px rgba(0,0,0,.55);
 }
 .btn-xl { padding: 16px 28px; font-size: 16px; }
+.oil-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.oil-price {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  letter-spacing: -0.04em;
+  margin: 8px 0 6px !important;
+}
+.oil-chg { font-family: var(--font-mono); font-size: 12px; color: var(--mute); }
+.tv-wrap {
+  padding: 14px;
+  margin-bottom: 8px;
+}
+.tv-wrap iframe {
+  width: 100%;
+  height: 420px;
+  border: 0;
+  border-radius: 12px;
+  margin-top: 10px;
+  background: #000;
+}
+.wire {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.desk-break {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: #12080a;
+  border-bottom: 1px solid rgba(255,77,58,.4);
+  overflow: hidden;
+}
+@media (max-width: 900px) {
+  .oil-grid, .wire { grid-template-columns: 1fr; }
+}
 .sheet {
   position: fixed;
   inset: 0;

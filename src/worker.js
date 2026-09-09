@@ -154,7 +154,8 @@ export default {
       "/hates": "/hates.html",
       "/people": "/people.html",
       "/proof": "/proof.html",
-      "/live": "/live.html"
+      "/live": "/live.html",
+      "/desk": "/desk.html"
     };
     const cleanPath = url.pathname.replace(/\/+$/, "") || "/";
     const pageFile = PAGES[cleanPath];
@@ -198,6 +199,69 @@ export default {
 
     if (!url.pathname.startsWith("/api/")) {
       return env.ASSETS.fetch(request);
+    }
+
+    if (url.pathname === "/api/oil" && request.method === "GET") {
+      const quote = async (symbol) => {
+        const r = await fetch(
+          `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=5d`,
+          { headers: { "User-Agent": "Mozilla/5.0 fx.nyptid.com desk" } }
+        );
+        if (!r.ok) throw new Error(String(r.status));
+        const j = await r.json();
+        const meta = j.chart.result[0].meta;
+        const price = Number(meta.regularMarketPrice);
+        const prev = Number(meta.chartPreviousClose || meta.previousClose || price);
+        const change = prev ? ((price - prev) / prev) * 100 : 0;
+        return { symbol, price, prev, change, currency: meta.currency || "USD" };
+      };
+      try {
+        const [brent, wti] = await Promise.all([quote("BZ=F"), quote("CL=F")]);
+        return json({
+          brent,
+          wti,
+          generated_at: new Date().toISOString()
+        });
+      } catch (err) {
+        return json({ error: "Oil quotes unavailable.", detail: String(err) }, 502);
+      }
+    }
+
+    if (url.pathname === "/api/world" && request.method === "GET") {
+      const feeds = [
+        { name: "BBC World", url: "https://feeds.bbci.co.uk/news/world/rss.xml" },
+        { name: "Al Jazeera", url: "https://www.aljazeera.com/xml/rss/all.xml" },
+        { name: "CNBC Energy", url: "https://www.cnbc.com/id/19854910/device/rss/rss.html" }
+      ];
+      const items = [];
+      for (const feed of feeds) {
+        try {
+          const xml = await fetch(feed.url, {
+            headers: { "User-Agent": "fx.nyptid.com desk/1.0" }
+          }).then((r) => r.text());
+          const blocks = xml.split(/<item[\s>]/i).slice(1, 7);
+          for (const block of blocks) {
+            const title = (block.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/i) || [])
+              .filter(Boolean)
+              .pop();
+            const link = (block.match(/<link><!\[CDATA\[(.*?)\]\]><\/link>|<link>(.*?)<\/link>/i) || [])
+              .filter(Boolean)
+              .pop();
+            const date = (block.match(/<pubDate>(.*?)<\/pubDate>/i) || [])[1];
+            if (title && link) {
+              items.push({
+                source: feed.name,
+                title: clean(title, 220),
+                url: clean(link, 400),
+                published: date || ""
+              });
+            }
+          }
+        } catch {
+          /* skip a dead feed */
+        }
+      }
+      return json({ items, generated_at: new Date().toISOString() });
     }
 
     if (url.pathname === "/api/feed" && request.method === "GET") {
