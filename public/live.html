@@ -15,9 +15,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/css/fx.css">
+  <link rel="stylesheet" href="/assets/css/fx.css?v=10">
 </head>
-<body class="is-live">
+<body class="inner">
   <div class="noise" aria-hidden="true"></div>
   <header class="nav glass" id="nav">
     <a class="brand" href="/">
@@ -36,39 +36,29 @@
     <button class="burger" id="burger" type="button" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
   </header>
 
-  <div class="breaking" aria-hidden="true">
-    <span class="breaking-tag">BREAKING</span>
-    <div class="breaking-track" id="breaking-track"></div>
-  </div>
-
-  <div class="onair" role="status">
-    <span class="onair-live"><i></i> LIVE</span>
-    <span class="onair-msg">Unfiltered X log · scraper + RSS + filings</span>
-    <span class="onair-stat" id="onair-count">0 on the wire</span>
-    <span class="onair-stat" id="onair-ping">connecting</span>
-    <button class="onair-alert" id="enable-alerts" type="button">Enable alerts</button>
-    <a class="onair-stat" href="/rss.xml">RSS</a>
-  </div>
-
-  <main class="live-page">
-    <div class="wrap live-wrap">
+  <main class="page">
+    <div class="wrap">
+      <div class="live-status glass">
+        <span class="onair-live"><i></i> LIVE</span>
+        <span id="onair-count">0 on the wire</span>
+        <span class="mono" id="onair-ping">connecting</span>
+        <button class="onair-alert" id="enable-alerts" type="button">Enable alerts</button>
+        <a class="mono" href="/rss.xml">RSS</a>
+      </div>
+      <div class="sec-head">
+        <div>
+          <div class="kicker">Live</div>
+          <h1>Unfiltered X log</h1>
+        </div>
+        <p>Scraper, RSS, and verified filings. Newest first. This page updates itself.</p>
+      </div>
       <div class="clocks" id="clocks">
         <span data-tz="UTC">UTC --:--</span>
         <span data-tz="America/New_York">ET --:--</span>
         <span data-tz="America/Los_Angeles">PT --:--</span>
         <span data-tz="Europe/London">LT --:--</span>
       </div>
-      <div class="tracker">
-        <article><label>On the wire</label><strong id="stat-wire">0</strong></article>
-        <article><label>Last ping</label><strong id="stat-ping">—</strong></article>
-        <article><label>Source</label><strong>X · RSS · filings</strong></article>
-        <article><label>Filter</label><strong>none</strong></article>
-      </div>
-      <header class="live-head">
-        <h1>Devlog</h1>
-        <p>Everything landing on the wire, unfiltered. Newest first. This is a running log, not a magazine.</p>
-      </header>
-      <div class="devlog" id="feed" aria-live="polite"></div>
+      <div class="feed" id="feed" aria-live="polite"></div>
     </div>
   </main>
 
@@ -83,6 +73,6 @@
       <p class="byline">by NYPTID Industries Advanced Technologies</p>
     </div>
   </footer>
-  <script src="/assets/js/feed.js"></script>
+  <script src="/assets/js/feed.js?v=10"></script>
 </body>
 </html>

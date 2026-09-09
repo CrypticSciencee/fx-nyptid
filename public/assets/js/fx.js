@@ -214,7 +214,10 @@
       },
       { threshold: 0.4 }
     );
-    els.forEach((el) => io.observe(el));
+    els.forEach((el) => {
+      if (el.textContent && el.textContent.trim() !== "0") return;
+      io.observe(el);
+    });
   }
 
   function nav() {

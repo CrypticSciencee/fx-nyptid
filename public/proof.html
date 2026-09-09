@@ -14,9 +14,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/css/fx.css">
+  <link rel="stylesheet" href="/assets/css/fx.css?v=10">
 </head>
-<body>
+<body class="inner">
   <div class="noise" aria-hidden="true"></div>
   <header class="nav glass" id="nav">
     <a class="brand" href="/">
@@ -85,6 +85,30 @@
       <p class="byline">by NYPTID Industries Advanced Technologies</p>
     </div>
   </footer>
-  <script src="/assets/js/fx.js"></script>
+  <script>
+    (function () {
+      var sheet = document.getElementById("sheet");
+      var open = document.getElementById("open-sheet");
+      var close = document.getElementById("sheet-close");
+      function show() {
+        if (!sheet) return;
+        sheet.hidden = false;
+        requestAnimationFrame(function () { sheet.classList.add("open"); });
+        var h = document.getElementById("handle");
+        if (h) h.focus();
+      }
+      function hide() {
+        if (!sheet) return;
+        sheet.classList.remove("open");
+        setTimeout(function () { sheet.hidden = true; }, 320);
+      }
+      if (open) open.addEventListener("click", show);
+      if (close) close.addEventListener("click", hide);
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") hide();
+      });
+    })();
+  </script>
+  <script src="/assets/js/fx.js?v=10"></script>
 </body>
 </html>
