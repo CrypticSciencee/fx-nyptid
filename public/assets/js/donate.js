@@ -11,10 +11,27 @@
   const status = document.getElementById("donate-status");
   const submit = document.getElementById("donate-submit");
   const ready = document.getElementById("donate-ready");
+  const modeEl = document.getElementById("donate-mode");
   const lede = document.getElementById("donate-lede");
+  const sum = document.getElementById("gift-sum");
+  const cadenceLabel = document.getElementById("gift-cadence");
   const chips = document.querySelectorAll("#amount-row [data-amount]");
-  const recurring = document.getElementById("recurring");
+  const cadenceBtns = document.querySelectorAll("#cadence [data-recurring]");
   let checkoutReady = false;
+  let recurring = false;
+
+  function money(n) {
+    return Number(n).toLocaleString("en-US", { maximumFractionDigits: 0 });
+  }
+
+  function paintGift() {
+    const amount = Number(amountInput.value) || 0;
+    if (sum) sum.textContent = amount >= 1 ? `$${money(amount)}` : "$—";
+    if (cadenceLabel) cadenceLabel.textContent = recurring ? "monthly · US dollars" : "one-time · US dollars";
+    if (submit && checkoutReady) {
+      submit.textContent = recurring ? "Continue · monthly" : "Continue to secure checkout";
+    }
+  }
 
   function setStatus(msg, err) {
     if (!status) return;
@@ -27,12 +44,23 @@
       chips.forEach((b) => b.classList.remove("sel"));
       btn.classList.add("sel");
       amountInput.value = btn.dataset.amount;
+      paintGift();
+    });
+  });
+
+  cadenceBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      cadenceBtns.forEach((b) => b.classList.remove("on"));
+      btn.classList.add("on");
+      recurring = btn.dataset.recurring === "true";
+      paintGift();
     });
   });
 
   amountInput?.addEventListener("input", () => {
     const v = String(Math.round(Number(amountInput.value) || 0));
     chips.forEach((b) => b.classList.toggle("sel", b.dataset.amount === v));
+    paintGift();
   });
 
   async function loadReady() {
@@ -40,21 +68,25 @@
       const res = await fetch("/api/donate", { cache: "no-store" });
       const data = await res.json();
       checkoutReady = Boolean(data.ready);
-      if (ready) {
-        ready.textContent = checkoutReady
+      if (ready) ready.textContent = "USD · journalism";
+      if (modeEl) {
+        modeEl.textContent = checkoutReady
           ? data.mode === "checkout"
-            ? "Stripe Checkout is live"
-            : "Stripe is live"
-          : "Pledges logging · checkout next";
+            ? "Stripe Checkout live"
+            : "Stripe live"
+          : "secure checkout connecting";
       }
       if (lede) {
         lede.textContent = checkoutReady
-          ? "Pick an amount. We log the pledge, then Stripe takes the payment. Monthly is optional."
-          : "Pick an amount. Checkout is being connected. The pledge is logged so nothing is lost.";
+          ? "Stripe Checkout. Cancel returns here. Paid landings go to a thank-you. Every gift is logged as journalism."
+          : "The gift is logged now. Secure checkout is being connected. Nothing is lost.";
       }
-      if (submit) submit.textContent = checkoutReady ? "Donate with Stripe" : "Pledge and continue";
+      if (submit) {
+        submit.textContent = checkoutReady ? "Continue to secure checkout" : "Log gift and continue";
+      }
+      paintGift();
     } catch {
-      if (ready) ready.textContent = "Desk will still take the pledge";
+      if (modeEl) modeEl.textContent = "desk will still take the gift";
     }
   }
 
@@ -66,7 +98,7 @@
       return;
     }
     submit.disabled = true;
-    setStatus(checkoutReady ? "Opening Stripe…" : "Logging the pledge…");
+    setStatus(checkoutReady ? "Opening secure checkout…" : "Logging the gift…");
     try {
       const res = await fetch("/api/donate", {
         method: "POST",
@@ -76,17 +108,17 @@
           name: document.getElementById("name")?.value || "",
           email: document.getElementById("email")?.value || "",
           note: document.getElementById("note")?.value || "",
-          recurring: Boolean(recurring?.checked)
+          recurring
         })
       });
       const data = await res.json();
       if (!res.ok && !data.pledge) {
-        setStatus(data.error || "Could not log the pledge.", true);
+        setStatus(data.error || "Could not log the gift.", true);
         submit.disabled = false;
         return;
       }
       if (data.stripe) {
-        setStatus("Sending you to Stripe…");
+        setStatus("Handing you to Stripe…");
         window.location.href = data.stripe;
         return;
       }
@@ -95,15 +127,27 @@
         submit.disabled = false;
         return;
       }
-      setStatus(`Pledge logged for $${amount}. Checkout is being connected. Thank you.`);
+      setStatus(`Gift logged for $${amount}. Checkout is being connected. Thank you.`);
       form.reset();
       amountInput.value = "40";
+      recurring = false;
+      cadenceBtns.forEach((b) => b.classList.toggle("on", b.dataset.recurring === "false"));
       chips.forEach((b) => b.classList.toggle("sel", b.dataset.amount === "40"));
+      paintGift();
     } catch {
       setStatus("Network dropped. Try again.", true);
     }
     submit.disabled = false;
   });
 
+  function tickClock() {
+    const el = document.getElementById("donate-clock");
+    if (!el) return;
+    el.textContent = `UTC ${new Date().toISOString().slice(11, 19)}`;
+  }
+
+  tickClock();
+  setInterval(tickClock, 1000);
+  paintGift();
   loadReady();
 })();

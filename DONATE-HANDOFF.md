@@ -1,106 +1,165 @@
-# Paste this into the Claude session wiring Stripe for FX
+# FX journalism donations — endpoint handoff
 
-You cannot be messaged from the FX Grok session. Wire Stripe for **journalism donations** on FX. Do not redesign the site. Do not rewrite donate.html. Do not put secrets in git.
+Paste this into the Claude session wiring Stripe. Do not redesign FX. Do not put secrets in git.
 
-## What is already live
+## Endpoint
 
-- Donate: https://fx.nyptid.com/donate
-- Thanks: https://fx.nyptid.com/donate/thanks
-- Repo: https://github.com/CrypticSciencee/fx-nyptid
-- Worker name: `fx`
-- Cloudflare account: `9f77543b0f03220e7bc8886cd4b4c909`
-- Custom domain: `fx.nyptid.com`
-- KV: binding `PROOF`, id `b995375e839442b39d8505b616cba7e6`, pledges stored under key `donations`
+Base: `https://fx.nyptid.com`
 
-### API the page already calls
+| Method | Path | Purpose |
+|---|---|---|
+| `GET` | `/api/donate` | Is checkout live? |
+| `POST` | `/api/donate` | Log gift, then return Stripe URL |
+| page | `/donate` | Donor UI (already built) |
+| page | `/donate/thanks` | Stripe success_url |
 
-`GET https://fx.nyptid.com/api/donate`
+Worker: `fx` · Cloudflare account `9f77543b0f03220e7bc8886cd4b4c909` · KV binding `PROOF` (`b995375e839442b39d8505b616cba7e6`) key `donations` · repo https://github.com/CrypticSciencee/fx-nyptid
+
+---
+
+### GET `/api/donate`
+
+No body. No auth.
+
+**Response 200**
 
 ```json
-{ "ready": false, "mode": null, "currency": "USD", "purpose": "journalism" }
+{
+  "ready": false,
+  "mode": null,
+  "currency": "USD",
+  "purpose": "journalism",
+  "note": "Pledges are logged. Set STRIPE_SECRET_KEY on Worker fx to take payment."
+}
 ```
 
-After you set the secret, `ready` becomes `true` and `mode` becomes `"checkout"`.
+| Field | After you set the secret |
+|---|---|
+| `ready` | `true` |
+| `mode` | `"checkout"` if `STRIPE_SECRET_KEY`, else `"link"` if `STRIPE_PAYMENT_LINK` |
+| `currency` | always `"USD"` |
+| `purpose` | always `"journalism"` |
 
-`POST https://fx.nyptid.com/api/donate`
+The page reads `ready` + `mode` only. Do not change this shape.
+
+---
+
+### POST `/api/donate`
+
+`Content-Type: application/json`
+
+**Request**
 
 ```json
-{ "amount": 40, "email": "optional", "name": "optional", "note": "optional", "recurring": false }
+{
+  "amount": 40,
+  "email": "optional@example.com",
+  "name": "optional",
+  "note": "optional",
+  "recurring": false
+}
 ```
 
-Worker then:
+| Field | Rules |
+|---|---|
+| `amount` | number, **required**, `1`–`100000` (USD, not cents) |
+| `email` | string, optional, max 120 |
+| `name` | string, optional, max 80 |
+| `note` | string, optional, max 500 |
+| `recurring` | boolean, optional. `true` = monthly subscription |
 
-1. Logs the pledge to KV (`purpose: journalism`, USD).
-2. If `STRIPE_SECRET_KEY` is set, creates a **Stripe Checkout Session** for that exact amount (cents) and returns `{ stripe: "https://checkout.stripe.com/..." }`. The browser redirects there.
-3. Else if `STRIPE_PAYMENT_LINK` is set, returns that URL (worse: custom amounts will not match unless the link is “customer chooses amount”).
-4. Else logs only.
+Rate limit: 12 POSTs / hour / IP.
 
-Checkout Session fields the Worker already sends:
+**Response 200 — checkout live**
 
+```json
+{
+  "ok": true,
+  "ready": true,
+  "mode": "checkout",
+  "session_id": "cs_...",
+  "stripe": "https://checkout.stripe.com/c/pay/cs_...",
+  "pledge": {
+    "id": "uuid",
+    "amount": 40,
+    "currency": "USD",
+    "purpose": "journalism",
+    "recurring": false,
+    "email": "",
+    "name": "",
+    "note": "",
+    "created_at": "2026-09-09T00:00:00.000Z"
+  }
+}
+```
+
+The browser sets `window.location` to `stripe`. That is the only redirect.
+
+**Response 200 — secret not set yet**
+
+Same object, `stripe: null`, `ready: false`. Gift is still in KV. Nothing is lost.
+
+**Errors**
+
+| Status | Body |
+|---|---|
+| 400 | `{ "error": "Send JSON." }` |
+| 400 | `{ "error": "Pick an amount between 1 and 100000." }` |
+| 429 | `{ "error": "Slow down. Come back in an hour." }` |
+| 502 | `{ "ok": true, "pledge": {...}, "stripe": null, "ready": false, "error": "<Stripe message>" }` |
+
+---
+
+### What the Worker already sends to Stripe Checkout
+
+`POST https://api.stripe.com/v1/checkout/sessions`
+
+- `mode`: `payment` or `subscription` if `recurring`
+- `line_items[0].price_data.currency` = `usd`
+- `line_items[0].price_data.unit_amount` = `amount * 100` (cents)
 - Product name: `FX journalism`
 - Description: `Support genuine journalism on fx.nyptid.com`
-- Currency: `usd`
-- Success: `https://fx.nyptid.com/donate/thanks?session_id={CHECKOUT_SESSION_ID}`
-- Cancel: `https://fx.nyptid.com/donate`
-- `client_reference_id` = pledge id
+- `success_url`: `https://fx.nyptid.com/donate/thanks?session_id={CHECKOUT_SESSION_ID}`
+- `cancel_url`: `https://fx.nyptid.com/donate`
+- `client_reference_id` = pledge `id`
+- `customer_email` if provided
 - `metadata.purpose` = `journalism`
-- Monthly if `recurring: true` (`mode=subscription`, interval `month`)
+- `metadata.pledge_id` = pledge `id`
+- Monthly: `recurring[interval]=month`
 
-Amounts on the page: $5, $15, $40, $100, $250, plus custom 1–100000.
+UI amounts: 5, 15, 40, 100, 250, plus custom.
 
-## What you must do
+---
 
-Preferred path (custom amounts work):
-
-1. Stripe Dashboard → account that can take USD.
-2. Copy the **Secret key** (`sk_live_...` for real money, `sk_test_...` only if they want a dry run).
-3. In this repo, from the FX project root:
+## Your job (only this)
 
 ```bash
+cd <fx-nyptid repo>
 npx wrangler secret put STRIPE_SECRET_KEY
-```
-
-Paste the key when prompted.
-
-4. Deploy the same Worker:
-
-```bash
+# paste sk_live_...  (sk_test_... only for a dry run)
 npx wrangler deploy
 ```
 
-That is the whole job. The page already redirects. The thanks page already exists.
+Then:
 
-### Optional fallback only
+```bash
+curl -sS https://fx.nyptid.com/api/donate
+# {"ready":true,"mode":"checkout",...}
 
-A Payment Link is worse because the donor’s chosen amount on FX will not automatically be the Stripe charge unless the link is customer-chooses-amount.
+curl -sS -X POST https://fx.nyptid.com/api/donate \
+  -H "content-type: application/json" \
+  -d "{\"amount\":5,\"name\":\"claude\",\"note\":\"endpoint check\"}"
+# "stripe":"https://checkout.stripe.com/..."
+```
+
+Open https://fx.nyptid.com/donate → Continue to secure checkout → Stripe → thanks.
+
+**Do not** use a fixed-price Payment Link as the primary path. Custom amounts will not match.
+
+Optional fallback only:
 
 ```bash
 npx wrangler secret put STRIPE_PAYMENT_LINK
 ```
 
-Do **not** use a fixed $40 Payment Link as the primary path.
-
-## Verify
-
-```bash
-curl -sS https://fx.nyptid.com/api/donate
-# ready: true, mode: "checkout"
-
-curl -sS -X POST https://fx.nyptid.com/api/donate \
-  -H "content-type: application/json" \
-  -d "{\"amount\":5,\"note\":\"wire check\",\"name\":\"claude\"}"
-# stripe: https://checkout.stripe.com/...
-```
-
-Open https://fx.nyptid.com/donate → Donate with Stripe → Checkout loads → pay (or cancel) → thanks or back to /donate.
-
-## Do not
-
-- Do not rewrite `/donate` or the Worker donate handlers unless Checkout fails.
-- Do not commit `sk_live` / `sk_test` / Payment Link URLs to git or `wrangler.toml`.
-- Do not change FX branding, copy, or nav.
-- Do not build a second donate page on nyptidindustries.com unless asked. FX is `fx.nyptid.com`.
-
-## If Checkout errors
-
-The POST returns 502 with `error` from Stripe (`data.error.message`). Fix the key, currency, or account, then `npx wrangler deploy` only if you changed Worker code. Changing a secret requires a new deploy **or** a new Worker request after `secret put` — run `npx wrangler deploy` after putting the secret to be safe.
+Never commit keys. Never rewrite `/donate` or `/api/donate` unless Checkout fails.

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Donate | FX</title>
-  <meta name="description" content="Support genuine journalism on FX. Keep the forensic ledger, the live desk, and the receipts online.">
+  <meta name="description" content="Support genuine journalism on FX. Named sources, live quotes, receipts. No ads.">
   <link rel="canonical" href="https://fx.nyptid.com/donate">
   <meta name="theme-color" content="#05060a">
   <meta property="og:title" content="Donate | FX">
@@ -14,10 +14,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/css/fx.css?v=13">
+  <link rel="stylesheet" href="/assets/css/fx.css?v=14">
 </head>
 <body class="inner">
   <div class="noise" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
   <header class="nav glass" id="nav">
     <a class="brand" href="/">
       <img class="brand-mark" src="/assets/icons/logo.svg" width="28" height="28" alt="">
@@ -36,63 +37,96 @@
     <button class="burger" id="burger" type="button" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
   </header>
 
-  <main class="page">
-    <div class="wrap donate-wrap">
+  <main class="page donate-page bg-alt">
+    <div class="wrap" style="position:relative;z-index:1">
+      <div class="desk-status glass">
+        <span class="onair-live"><i></i> FX</span>
+        <span class="mono" id="donate-ready">USD · journalism</span>
+        <span class="mono" id="donate-mode">checkout connecting</span>
+        <span class="mono" id="donate-clock">UTC --:--:--</span>
+      </div>
+
       <div class="sec-head">
         <div>
-          <div class="kicker">Support journalism</div>
-          <h1>Genuine journalism. Named sources. No ads.</h1>
+          <div class="kicker">Support the desk</div>
+          <h1>Keep genuine journalism on the wire.</h1>
         </div>
-        <p>FX is a forensic ledger of x.com and a live world desk. Receipts, not vibes. Donations keep the scraper, the quotes, and the wires running.</p>
+        <p class="lede" style="margin:0;max-width:36ch">Named sources. Live quotes. Receipts with the post still attached. No ads. No X Premium. The ledger stays public.</p>
       </div>
 
       <div class="donate-layout">
-        <form class="proof-form glass" id="donate-form" novalidate>
-          <div class="kicker" id="donate-ready">Checkout status</div>
-          <p class="sheet-lede" id="donate-lede">Pick an amount. Stripe takes the payment. Every pledge is logged.</p>
-          <div class="field">
-            <label>Amount (USD)</label>
-            <div class="amount-row" id="amount-row">
-              <button type="button" data-amount="5">$5</button>
-              <button type="button" data-amount="15">$15</button>
-              <button type="button" class="sel" data-amount="40">$40</button>
-              <button type="button" data-amount="100">$100</button>
-              <button type="button" data-amount="250">$250</button>
+        <form class="gift-panel glass" id="donate-form" novalidate>
+          <div class="gift-top">
+            <div>
+              <div class="kicker">Your gift</div>
+              <p class="gift-sum" id="gift-sum">$40</p>
+              <p class="mono" id="gift-cadence">one-time · US dollars</p>
+            </div>
+            <div class="seg" id="cadence" role="group" aria-label="Cadence">
+              <button type="button" class="on" data-recurring="false">Once</button>
+              <button type="button" data-recurring="true">Monthly</button>
+            </div>
+          </div>
+
+          <div class="gift-grid" id="amount-row">
+            <button type="button" data-amount="5"><b>$5</b><span>wire</span></button>
+            <button type="button" data-amount="15"><b>$15</b><span>clocks</span></button>
+            <button type="button" class="sel" data-amount="40"><b>$40</b><span>desk</span></button>
+            <button type="button" data-amount="100"><b>$100</b><span>cases</span></button>
+            <button type="button" data-amount="250"><b>$250</b><span>the wall</span></button>
+          </div>
+
+          <div class="gift-custom">
+            <label for="amount">Custom</label>
+            <div class="gift-money">
+              <span>$</span>
+              <input id="amount" name="amount" type="number" min="1" max="100000" step="1" value="40" required>
+            </div>
+          </div>
+
+          <div class="gift-who">
+            <div class="field">
+              <label for="name">Name</label>
+              <input id="name" name="name" type="text" maxlength="80" placeholder="Optional" autocomplete="name">
+            </div>
+            <div class="field">
+              <label for="email">Email for the receipt</label>
+              <input id="email" name="email" type="email" maxlength="120" placeholder="Optional" autocomplete="email">
             </div>
           </div>
           <div class="field">
-            <label for="amount">Custom amount</label>
-            <input id="amount" name="amount" type="number" min="1" max="100000" step="1" value="40" required>
+            <label for="note">Note to the desk</label>
+            <textarea id="note" name="note" rows="3" maxlength="500" placeholder="Optional. Why this ledger matters."></textarea>
           </div>
-          <div class="field">
-            <label class="check-row" for="recurring">
-              <input id="recurring" name="recurring" type="checkbox">
-              Monthly, same amount
-            </label>
-          </div>
-          <div class="field">
-            <label for="name">Name <span class="mute">(optional)</span></label>
-            <input id="name" name="name" type="text" maxlength="80" placeholder="How we should thank you">
-          </div>
-          <div class="field">
-            <label for="email">Email <span class="mute">(optional, for a receipt)</span></label>
-            <input id="email" name="email" type="email" maxlength="120" placeholder="you@example.com" autocomplete="email">
-          </div>
-          <div class="field">
-            <label for="note">Note <span class="mute">(optional)</span></label>
-            <textarea id="note" name="note" rows="3" maxlength="500" placeholder="Why you are backing the desk."></textarea>
-          </div>
-          <div class="form-actions">
-            <button class="btn solid" type="submit" id="donate-submit">Donate</button>
+
+          <div class="gift-go">
+            <button class="btn solid btn-xl" type="submit" id="donate-submit">Continue to secure checkout</button>
             <p class="form-status" id="donate-status" role="status"></p>
+            <p class="mono" id="donate-lede">Stripe Checkout. Cancel returns here. Paid landings go to a thank-you. Every gift is logged as journalism.</p>
           </div>
         </form>
 
-        <aside class="proof-aside glass">
-          <div class="kicker">Where it goes</div>
-          <h3>The desk, the scraper, the wall.</h3>
-          <p>Donations support genuine true journalism on FX: live crude quotes, named wires, verified X receipts, and the people who keep the case file honest. Not ads. Not X Premium.</p>
-          <p class="mono" style="margin-top:16px">USD · Stripe Checkout · purpose: journalism. Cancel returns here. Paid landings go to /donate/thanks.</p>
+        <aside class="gift-aside">
+          <article class="gift-fund glass">
+            <div class="kicker">01</div>
+            <h3>The desk</h3>
+            <p>Live crude, named wires, city clocks. The world the firehose sits on.</p>
+          </article>
+          <article class="gift-fund glass">
+            <div class="kicker">02</div>
+            <h3>The scraper</h3>
+            <p>Public X posts, verified, then filed. No tombstone without a URL.</p>
+          </article>
+          <article class="gift-fund glass">
+            <div class="kicker">03</div>
+            <h3>The cases</h3>
+            <p>Unfiltered files. Street story and company-adjacent story on the same table.</p>
+          </article>
+          <article class="gift-fund glass">
+            <div class="kicker">04</div>
+            <h3>No ads</h3>
+            <p>Not a funnel. Not a check. Journalism that does not owe X a courtesy.</p>
+          </article>
         </aside>
       </div>
     </div>
@@ -113,6 +147,6 @@
       <p class="byline">by NYPTID Industries Advanced Technologies</p>
     </div>
   </footer>
-  <script src="/assets/js/donate.js?v=13"></script>
+  <script src="/assets/js/donate.js?v=14"></script>
 </body>
 </html>

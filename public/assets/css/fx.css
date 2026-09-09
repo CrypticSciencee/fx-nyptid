@@ -1154,13 +1154,156 @@ footer {
 .donate-band h3 { margin: 8px 0 6px; }
 .donate-band p { margin: 0; color: var(--mute); max-width: 54ch; }
 .donate-wrap { max-width: 980px; }
+.donate-page .sec-head { margin-bottom: 28px; }
 .donate-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 280px;
-  gap: 18px;
+  grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.8fr);
+  gap: 16px;
   align-items: start;
 }
 .donate-layout .field textarea { min-height: 88px; }
+.gift-panel {
+  padding: 26px 26px 24px;
+  overflow: visible;
+}
+.gift-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+.gift-sum {
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 6vw, 4.4rem);
+  letter-spacing: -0.07em;
+  line-height: 0.9;
+  color: var(--paper);
+  margin: 8px 0 6px;
+}
+.seg {
+  display: flex;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(0,0,0,.35);
+  flex: none;
+}
+.seg button {
+  border: 0;
+  background: transparent;
+  color: var(--mute);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.seg button.on {
+  background: var(--paper);
+  color: #111;
+}
+.gift-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.gift-grid button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 14px 12px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(0,0,0,.32);
+  color: var(--paper);
+  cursor: pointer;
+  text-align: left;
+}
+.gift-grid button b {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  letter-spacing: -0.04em;
+}
+.gift-grid button span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.gift-grid button.sel,
+.gift-grid button:hover {
+  border-color: var(--gold);
+  background: var(--gold-dim);
+}
+.gift-grid button.sel b { color: var(--gold); }
+.gift-custom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.gift-custom label {
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.gift-money {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: min(220px, 100%);
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(0,0,0,.45);
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--paper);
+}
+.gift-money input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 12px 0;
+  outline: none;
+  font: inherit;
+  color: inherit;
+}
+.gift-who {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.gift-go {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.gift-go .btn { width: fit-content; }
+.gift-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.gift-fund {
+  padding: 16px 16px 14px;
+  min-height: 0;
+}
+.gift-fund h3 { margin: 6px 0 6px; font-size: 1.05rem; }
+.gift-fund p { margin: 0; color: var(--mute); font-size: 0.92rem; }
 .desk-split h2 {
   font-size: clamp(1.35rem, 2.2vw, 1.85rem);
   line-height: 1.15;
@@ -1211,7 +1354,9 @@ footer {
 .foot-links a:hover { color: var(--cyan); }
 .nav-cta[aria-current="page"] { box-shadow: 0 0 0 1px var(--cyan); }
 @media (max-width: 900px) {
-  .oil-grid, .wire, .desk-split, .donate-layout, .split.trio, .case-index { grid-template-columns: 1fr; }
+  .oil-grid, .wire, .desk-split, .donate-layout, .split.trio, .case-index, .gift-who { grid-template-columns: 1fr; }
+  .gift-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .gift-top { flex-direction: column; align-items: flex-start; }
   .donate-band { flex-direction: column; align-items: flex-start; }
   .world-pip { right: 12px; bottom: 12px; }
 }
