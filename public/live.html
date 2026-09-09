@@ -30,7 +30,7 @@
       <a href="/#case">Case file</a>
       <a href="/#ledger">150 hates</a>
       <a href="/#people">People</a>
-      <a href="/live">Live feed</a>
+      <a href="/live" aria-current="page">Live feed</a>
       <a href="/#proof">Submit proof</a>
     </nav>
     <a class="nav-cta" href="/#proof">Submit proof</a>
@@ -38,15 +38,16 @@
   </header>
 
   <main class="live-page">
-    <div class="wrap">
-      <div class="live-head">
-        <div>
-          <div class="live-dot"><i></i> Live</div>
-          <h1 class="wordmark" style="font-size:clamp(3rem,8vw,6rem)">Feed<span>people saying why they hate x.com</span></h1>
+    <div class="wrap live-wrap">
+      <header class="live-head">
+        <div class="live-kicker">
+          <span class="live-dot"><i></i> Live</span>
+          <span class="mono" id="feed-count">0 posts</span>
         </div>
-        <p class="lede" style="max-width:36ch;margin:0">Public posts and filings, as they land. Every card is a handle and a link. Polls every four seconds.</p>
-      </div>
-      <div class="feed" id="feed"></div>
+        <h1>Live feed</h1>
+        <p>People saying why they hate x.com. Every row is a handle and a post link.</p>
+      </header>
+      <div class="feed" id="feed" aria-live="polite"></div>
     </div>
   </main>
 

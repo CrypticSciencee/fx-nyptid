@@ -1,9 +1,12 @@
 (() => {
   const root = document.getElementById("feed");
+  const countEl = document.getElementById("feed-count");
   const burger = document.getElementById("burger");
   const nav = document.getElementById("nav");
   const seen = new Set();
   let first = true;
+  let total = 0;
+  let timer = 0;
 
   const esc = (s) =>
     String(s || "").replace(/[&<>"']/g, (c) => ({
@@ -14,27 +17,67 @@
       "'": "&#39;"
     })[c]);
 
+  const initials = (handle) =>
+    String(handle || "?")
+      .replace(/^@/, "")
+      .slice(0, 2)
+      .toUpperCase();
+
+  const sourceLabel = (source) => {
+    if (source === "proof") return "filing";
+    if (source === "scrape") return "post";
+    return source || "live";
+  };
+
+  function ago(iso) {
+    const then = new Date(iso).getTime();
+    if (!then) return "";
+    const s = Math.max(0, Math.round((Date.now() - then) / 1000));
+    if (s < 60) return `${s}s ago`;
+    const m = Math.round(s / 60);
+    if (m < 60) return `${m}m ago`;
+    const h = Math.round(m / 60);
+    if (h < 48) return `${h}h ago`;
+    const d = Math.round(h / 24);
+    return `${d}d ago`;
+  }
+
   burger?.addEventListener("click", () => {
     const open = nav.classList.toggle("open");
     burger.setAttribute("aria-expanded", open ? "true" : "false");
   });
 
   function card(item, isNew) {
-    const when = item.created_at ? new Date(item.created_at).toUTCString() : "";
     const url = item.url || item.proof_url || item.profile_url;
     const profile = item.profile_url || (item.handle ? `https://x.com/${item.handle}` : url);
+    const handle = item.handle || "unknown";
     return `
-      <article class="feed-item glass${isNew ? " new" : ""}" data-id="${esc(item.id)}">
-        <div class="feed-meta">
-          <a href="${esc(profile)}" target="_blank" rel="noopener noreferrer">@${esc(item.handle)}</a>
-          <span>${esc(item.source || "live")} · ${esc(when)}</span>
-        </div>
-        <p>${esc(item.text || item.statement)}</p>
-        <div class="pills">
-          <a class="pill" href="${esc(profile)}" target="_blank" rel="noopener noreferrer">profile</a>
-          ${url ? `<a class="pill" href="${esc(url)}" target="_blank" rel="noopener noreferrer">post</a>` : ""}
+      <article class="feed-item${isNew ? " new" : ""}" data-id="${esc(item.id)}" data-ts="${esc(item.created_at || "")}">
+        <div class="feed-av" aria-hidden="true">${esc(initials(handle))}</div>
+        <div class="feed-body">
+          <div class="feed-meta">
+            <a href="${esc(profile)}" target="_blank" rel="noopener noreferrer">@${esc(handle)}</a>
+            <span><span class="src">${esc(sourceLabel(item.source))}</span> · <time datetime="${esc(item.created_at || "")}">${esc(ago(item.created_at))}</time></span>
+          </div>
+          <p>${esc(item.text || item.statement)}</p>
+          <div class="pills">
+            ${url ? `<a class="pill" href="${esc(url)}" target="_blank" rel="noopener noreferrer">Open post</a>` : ""}
+            <a class="pill ghost" href="${esc(profile)}" target="_blank" rel="noopener noreferrer">Profile</a>
+          </div>
         </div>
       </article>`;
+  }
+
+  function setCount(n) {
+    total = n;
+    if (countEl) countEl.textContent = `${n} post${n === 1 ? "" : "s"}`;
+  }
+
+  function refreshTimes() {
+    root.querySelectorAll(".feed-item[data-ts] time").forEach((el) => {
+      const ts = el.closest(".feed-item")?.dataset.ts;
+      if (ts) el.textContent = ago(ts);
+    });
   }
 
   async function tick() {
@@ -43,7 +86,15 @@
       const data = await res.json();
       const items = data.items || [];
       if (!items.length && first) {
-        root.innerHTML = `<div class="empty glass">Nothing live yet. File proof or push the scraper.</div>`;
+        root.innerHTML = `<div class="empty">Nothing live yet. File proof or push the scraper.</div>`;
+        setCount(0);
+        first = false;
+        return;
+      }
+      if (first) {
+        items.forEach((item) => item.id && seen.add(item.id));
+        root.innerHTML = items.map((item) => card(item, false)).join("");
+        setCount(items.length);
         first = false;
         return;
       }
@@ -53,25 +104,38 @@
         seen.add(item.id);
         fresh.push(item);
       }
-      if (first) {
-        items.forEach((item) => item.id && seen.add(item.id));
-        root.innerHTML = items.map((item) => card(item, false)).join("");
-        first = false;
-        return;
-      }
       if (fresh.length) {
         const wrap = document.createElement("div");
         wrap.innerHTML = fresh.map((item) => card(item, true)).join("");
-        while (wrap.firstChild) root.prepend(wrap.lastChild);
+        const nodes = [];
+        while (wrap.firstChild) nodes.push(wrap.firstChild);
+        nodes.reverse().forEach((node) => root.prepend(node));
+        setCount(total + fresh.length);
       }
+      refreshTimes();
     } catch {
       if (first) {
-        root.innerHTML = `<div class="empty glass">Feed is down. Retrying.</div>`;
+        root.innerHTML = `<div class="empty">Feed is down. Retrying.</div>`;
         first = false;
       }
     }
   }
 
-  tick();
-  setInterval(tick, 4000);
+  function play() {
+    if (timer) return;
+    tick();
+    timer = setInterval(tick, 4000);
+  }
+
+  function pause() {
+    clearInterval(timer);
+    timer = 0;
+  }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) pause();
+    else play();
+  });
+
+  play();
 })();
