@@ -1,12 +1,14 @@
 (() => {
   const root = document.getElementById("feed");
-  const countEl = document.getElementById("feed-count");
+  const countEl = document.getElementById("onair-count");
+  const pingEl = document.getElementById("onair-ping");
   const burger = document.getElementById("burger");
   const nav = document.getElementById("nav");
   const seen = new Set();
   let first = true;
   let total = 0;
   let timer = 0;
+  let lastPing = 0;
 
   const esc = (s) =>
     String(s || "").replace(/[&<>"']/g, (c) => ({
@@ -70,7 +72,13 @@
 
   function setCount(n) {
     total = n;
-    if (countEl) countEl.textContent = `${n} post${n === 1 ? "" : "s"}`;
+    if (countEl) countEl.textContent = `${n} on the wire`;
+    document.title = n ? `LIVE · ${n} | FX` : "LIVE | FX";
+  }
+
+  function setPing() {
+    lastPing = Date.now();
+    if (pingEl) pingEl.textContent = "updated just now";
   }
 
   function refreshTimes() {
@@ -78,6 +86,10 @@
       const ts = el.closest(".feed-item")?.dataset.ts;
       if (ts) el.textContent = ago(ts);
     });
+    if (pingEl && lastPing) {
+      const s = Math.max(0, Math.round((Date.now() - lastPing) / 1000));
+      pingEl.textContent = s < 2 ? "updated just now" : `ping ${s}s ago`;
+    }
   }
 
   async function tick() {
@@ -85,6 +97,7 @@
       const res = await fetch("/api/feed", { cache: "no-store" });
       const data = await res.json();
       const items = data.items || [];
+      setPing();
       if (!items.length && first) {
         root.innerHTML = `<div class="empty">Nothing live yet. File proof or push the scraper.</div>`;
         setCount(0);
@@ -114,6 +127,7 @@
       }
       refreshTimes();
     } catch {
+      if (pingEl) pingEl.textContent = "reconnect";
       if (first) {
         root.innerHTML = `<div class="empty">Feed is down. Retrying.</div>`;
         first = false;
