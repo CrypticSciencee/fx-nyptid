@@ -45,16 +45,90 @@ function normalizeHandle(value, profileUrl) {
   return HANDLE.test(handle) ? handle : "";
 }
 
+function asFeed(item, source) {
+  return {
+    id: item.id,
+    source,
+    handle: item.handle,
+    display_name: item.display_name || item.author || item.handle,
+    text: item.text || item.statement,
+    url: item.url || item.proof_url,
+    profile_url: item.profile_url || (item.handle ? `https://x.com/${item.handle}` : ""),
+    created_at: item.created_at
+  };
+}
+
+async function readList(env, key) {
+  const raw = await env.PROOF.get(key);
+  return raw ? JSON.parse(raw) : [];
+}
+
+async function writeList(env, key, items) {
+  await env.PROOF.put(key, JSON.stringify(items.slice(0, 500)));
+}
+
+async function pushFeed(env, item) {
+  const feed = await readList(env, "feed");
+  if (feed.some((row) => row.id === item.id || (row.url && row.url === item.url))) return;
+  feed.unshift(item);
+  await writeList(env, "feed", feed);
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+
+    if (url.pathname === "/live" || url.pathname === "/live/") {
+      const page = await env.ASSETS.fetch(new URL("/live.html", request.url));
+      const headers = new Headers(page.headers);
+      headers.set("cache-control", "no-store, no-cache, must-revalidate, max-age=0");
+      return new Response(page.body, { status: page.status, headers });
+    }
+
     if (!url.pathname.startsWith("/api/")) {
       return env.ASSETS.fetch(request);
     }
 
+    if (url.pathname === "/api/feed" && request.method === "GET") {
+      let feed = await readList(env, "feed");
+      if (!feed.length) {
+        const proofs = await readList(env, "proofs");
+        feed = proofs.map((p) => asFeed(p, "proof"));
+      }
+      return json({ items: feed, live: true });
+    }
+
+    if (url.pathname === "/api/feed" && request.method === "POST") {
+      let body;
+      try {
+        body = await request.json();
+      } catch {
+        return json({ error: "Send JSON." }, 400);
+      }
+      const postUrl = xUrl(body.url || body.proof_url);
+      const handle = normalizeHandle(body.handle, body.author_url || body.profile_url || postUrl);
+      const text = clean(body.text || body.statement, 1200);
+      if (!handle || !STATUS.test(postUrl) || text.length < 8) {
+        return json({ error: "Need handle, x.com/status URL, and text." }, 400);
+      }
+      const item = asFeed(
+        {
+          id: crypto.randomUUID(),
+          handle,
+          display_name: clean(body.author || body.display_name, 80) || handle,
+          text,
+          url: postUrl,
+          profile_url: `https://x.com/${handle}`,
+          created_at: new Date().toISOString()
+        },
+        "scrape"
+      );
+      await pushFeed(env, item);
+      return json({ ok: true, item });
+    }
+
     if (url.pathname === "/api/proof" && request.method === "GET") {
-      const raw = await env.PROOF.get("proofs");
-      const items = raw ? JSON.parse(raw) : [];
+      const items = await readList(env, "proofs");
       return json({ items });
     }
 
@@ -91,7 +165,7 @@ export default {
         return json({ error: "Link a real X profile (x.com/yourhandle)." }, 400);
       }
       if (!STATUS.test(proofUrl)) {
-        return json({ error: "Proof must be a public X post URL (x.com/handle/status/…)." }, 400);
+        return json({ error: "Proof must be a public X post URL (x.com/handle/status/123)." }, 400);
       }
       if (statement.length < 12) {
         return json({ error: "Tell us what happened. Twelve characters, minimum." }, 400);
@@ -108,10 +182,10 @@ export default {
         display_name: name || handle
       };
 
-      const raw = await env.PROOF.get("proofs");
-      const items = raw ? JSON.parse(raw) : [];
+      const items = await readList(env, "proofs");
       items.unshift(item);
-      await env.PROOF.put("proofs", JSON.stringify(items.slice(0, 500)));
+      await writeList(env, "proofs", items);
+      await pushFeed(env, asFeed(item, "proof"));
       return json({ ok: true, item });
     }
 

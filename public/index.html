@@ -3,17 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>FX — The forensic ledger of x.com</title>
-  <meta name="description" content="A photoreal glass case file of x.com: why people still like it, 150 reasons they hate it, and the @Parodyjeffx suspension receipts — with absolute links to every person in the screenshots.">
+  <title>FX | The forensic ledger of x.com</title>
+  <meta name="description" content="A photoreal glass case file of x.com: why people still like it, 150 reasons they hate it, and the @Parodyjeffx suspension receipts, with absolute links to every person in the screenshots.">
   <link rel="canonical" href="https://fx.nyptid.com/">
   <meta name="theme-color" content="#05060a">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://fx.nyptid.com/">
-  <meta property="og:title" content="FX — The forensic ledger of x.com">
+  <meta property="og:title" content="FX | The forensic ledger of x.com">
   <meta property="og:description" content="Why people like X. Why they hate X. Case file: @Parodyjeffx. Every screenshot links to the people themselves.">
   <meta property="og:image" content="https://fx.nyptid.com/assets/bg/hero.jpg">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="FX — The forensic ledger of x.com">
+  <meta name="twitter:title" content="FX | The forensic ledger of x.com">
   <meta name="twitter:description" content="The free-speech platform, under glass.">
   <meta name="twitter:image" content="https://fx.nyptid.com/assets/bg/hero.jpg">
   <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
@@ -39,9 +39,10 @@
       <a href="#case">Case file</a>
       <a href="#ledger">150 hates</a>
       <a href="#people">People</a>
+      <a href="/live">Live feed</a>
       <a href="#proof">Submit proof</a>
     </nav>
-    <a class="nav-cta" href="#proof">Submit proof</a>
+    <a class="nav-cta" href="/live">Live feed</a>
     <button class="burger" id="burger" type="button" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
   </header>
 
@@ -228,28 +229,33 @@
         </div>
         <div class="proof-layout">
           <form class="glass proof-form" id="proof-form" novalidate>
-            <label class="hp" for="company">Company
+            <div class="hp" aria-hidden="true">
+              <label for="company">Company</label>
               <input id="company" name="company" type="text" tabindex="-1" autocomplete="off">
-            </label>
-            <div class="fields">
-              <label>X handle
-                <input name="handle" type="text" placeholder="@handle" maxlength="16" required>
-              </label>
-              <label>X profile URL
-                <input name="profile_url" type="url" placeholder="https://x.com/handle" required>
-              </label>
-              <label class="full">Proof post URL
-                <input name="proof_url" type="url" placeholder="https://x.com/handle/status/…" required>
-              </label>
-              <label class="full">More links (optional)
-                <input name="extra_urls" type="text" placeholder="More x.com/status URLs, separated by spaces">
-              </label>
-              <label>Display name (optional)
-                <input name="display_name" type="text" maxlength="80" placeholder="How you want it listed">
-              </label>
-              <label class="full">What happened
-                <textarea name="statement" rows="5" maxlength="1200" placeholder="What X did. What you posted. Why it is bullshit." required></textarea>
-              </label>
+            </div>
+            <div class="field">
+              <label for="handle">X handle</label>
+              <input id="handle" name="handle" type="text" placeholder="@handle" maxlength="16" autocomplete="username" required>
+            </div>
+            <div class="field">
+              <label for="profile_url">X profile URL</label>
+              <input id="profile_url" name="profile_url" type="url" placeholder="https://x.com/handle" inputmode="url" required>
+            </div>
+            <div class="field">
+              <label for="proof_url">Proof post URL</label>
+              <input id="proof_url" name="proof_url" type="url" placeholder="https://x.com/handle/status/123" inputmode="url" required>
+            </div>
+            <div class="field">
+              <label for="extra_urls">More links (optional)</label>
+              <input id="extra_urls" name="extra_urls" type="text" placeholder="More x.com/status URLs, separated by spaces">
+            </div>
+            <div class="field">
+              <label for="display_name">Display name (optional)</label>
+              <input id="display_name" name="display_name" type="text" maxlength="80" placeholder="How you want it listed">
+            </div>
+            <div class="field">
+              <label for="statement">What happened</label>
+              <textarea id="statement" name="statement" rows="6" maxlength="1200" placeholder="What X did. What you posted. Why it is bullshit." required></textarea>
             </div>
             <div class="form-actions">
               <button class="btn solid" type="submit">File the proof</button>
@@ -259,7 +265,8 @@
           <aside class="glass proof-aside">
             <img class="logo-lockup" src="assets/icons/mark.jpg" alt="FX emblem">
             <h3>Rules of the wall</h3>
-            <p>Handle + profile link + a real <span class="mono">/status/</span> URL. Blue check optional. Anonymous essays without a post are trash and get dropped.</p>
+            <p>Handle, profile link, and a real <span class="mono">/status/</span> URL. Blue check optional. No post link, no filing.</p>
+            <a class="btn" href="/live" style="margin-top:16px">Open the live feed</a>
           </aside>
         </div>
         <div class="proof-wall" id="proof-wall"></div>

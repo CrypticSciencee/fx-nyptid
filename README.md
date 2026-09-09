@@ -1,4 +1,4 @@
-# FX — fx.nyptid.com
+# FX | fx.nyptid.com
 
 **This will be updated often for more and more reasons why people don’t like x.com.**
 

@@ -88,6 +88,11 @@ def main() -> int:
     parser.add_argument("urls", nargs="*", help="x.com status URLs")
     parser.add_argument("--file", help="Text file, one URL per line")
     parser.add_argument("--out", default="scraper/out/receipts.json")
+    parser.add_argument(
+        "--push",
+        default="",
+        help="POST receipts to the live feed, e.g. https://fx.nyptid.com/api/feed",
+    )
     args = parser.parse_args()
 
     urls = load_urls(args)
@@ -115,6 +120,22 @@ def main() -> int:
     }
     out_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     print(f"wrote {out_path} ({len(receipts)} receipts, {len(errors)} errors)")
+
+    if args.push:
+        for row in receipts:
+            body = {
+                "handle": row.get("handle"),
+                "author": row.get("author"),
+                "url": row.get("url"),
+                "text": (row.get("text") or "")[:1200],
+            }
+            try:
+                posted = requests.post(args.push, json=body, timeout=20)
+                posted.raise_for_status()
+                print(f"push ok  {row.get('url')}")
+            except Exception as exc:  # noqa: BLE001
+                print(f"push err {row.get('url')}  {exc}", file=sys.stderr)
+
     return 0 if receipts else 2
 
 

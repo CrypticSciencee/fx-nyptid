@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Live feed | FX</title>
+  <meta name="description" content="Live feed of people saying why they hate x.com, with links to the posts.">
+  <link rel="canonical" href="https://fx.nyptid.com/live">
+  <meta name="theme-color" content="#05060a">
+  <meta property="og:title" content="Live feed | FX">
+  <meta property="og:url" content="https://fx.nyptid.com/live">
+  <meta property="og:image" content="https://fx.nyptid.com/assets/bg/hero.jpg">
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/fx.css">
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <header class="nav glass" id="nav">
+    <a class="brand" href="/">
+      <img class="brand-mark" src="/assets/icons/logo.svg" width="28" height="28" alt="">
+      <span>FX</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="/#exhibit">Exhibits</a>
+      <a href="/#case">Case file</a>
+      <a href="/#ledger">150 hates</a>
+      <a href="/#people">People</a>
+      <a href="/live">Live feed</a>
+      <a href="/#proof">Submit proof</a>
+    </nav>
+    <a class="nav-cta" href="/#proof">Submit proof</a>
+    <button class="burger" id="burger" type="button" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </header>
+
+  <main class="live-page">
+    <div class="wrap">
+      <div class="live-head">
+        <div>
+          <div class="live-dot"><i></i> Live</div>
+          <h1 class="wordmark" style="font-size:clamp(3rem,8vw,6rem)">Feed<span>people saying why they hate x.com</span></h1>
+        </div>
+        <p class="lede" style="max-width:36ch;margin:0">Public posts and filings, as they land. Every card is a handle and a link. Polls every four seconds.</p>
+      </div>
+      <div class="feed" id="feed"></div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <a class="foot-brand" href="/">
+        <img src="/assets/icons/logo.svg" width="36" height="36" alt="">
+        <span>
+          <strong>© FX</strong>
+          <em>fx.nyptid.com</em>
+        </span>
+      </a>
+      <p class="byline">by NYPTID Industries Advanced Technologies</p>
+    </div>
+  </footer>
+
+  <script src="/assets/js/feed.js"></script>
+</body>
+</html>

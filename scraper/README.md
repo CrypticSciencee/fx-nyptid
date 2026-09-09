@@ -4,7 +4,7 @@ Public oEmbed puller for x.com status URLs. No login. No cookies. No auto-like b
 
 ```bash
 pip install -r scraper/requirements.txt
-python scraper/fx_receipts.py --file scraper/urls.txt --out scraper/out/receipts.json
+python scraper/fx_receipts.py --file scraper/urls.txt --out scraper/out/receipts.json --push https://fx.nyptid.com/api/feed
 ```
 
-Drop more post URLs in `urls.txt`. The live wall on the site is the form at `/#proof` — this scraper is for bulk receipts you already have links to.
+That writes JSON and dumps the posts into the Live feed tab. Drop more `x.com/handle/status/...` URLs in `urls.txt`.

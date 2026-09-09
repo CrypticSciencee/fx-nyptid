@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "scrape": "python scraper/fx_receipts.py --file scraper/urls.txt --out scraper/out/receipts.json"
+    "scrape": "python scraper/fx_receipts.py --file scraper/urls.txt --out scraper/out/receipts.json --push https://fx.nyptid.com/api/feed"
   },
   "devDependencies": {
     "wrangler": "^4.34.0"
