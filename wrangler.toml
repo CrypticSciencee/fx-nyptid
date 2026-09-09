@@ -1,3 +1,12 @@
-name = "fx-nyptid"
-compatibility_date = "2026-09-01"
-pages_build_output_dir = "public"
+name = "fx"
+account_id = "9f77543b0f03220e7bc8886cd4b4c909"
+compatibility_date = "2026-09-08"
+workers_dev = true
+
+[assets]
+directory = "./public"
+not_found_handling = "404-page"
+
+[[routes]]
+pattern = "fx.nyptid.com"
+custom_domain = true

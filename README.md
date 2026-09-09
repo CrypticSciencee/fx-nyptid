@@ -4,13 +4,13 @@
 
 Photoreal glass case file of [x.com](https://x.com). Why people still like the firehose, why they hate it, and the `@Parodyjeffx` exhibits with **absolute links to every person** in the screenshots.
 
-Live: [fx.nyptid.com](https://fx.nyptid.com) · not affiliated with X Corp.
+**Live: [fx.nyptid.com](https://fx.nyptid.com)** · Cloudflare · not affiliated with X Corp.
 
 The ledger in `public/assets/js/data.js` is the living file. New exhibits, new handles, new hates — this repo is a running list, not a frozen rant.
 
 ## Stack
 
-Static site. No build step. Cloudflare Pages.
+Static site. No build step. Hosted on Cloudflare Workers static assets at **https://fx.nyptid.com**.
 
 ```
 public/
@@ -37,25 +37,16 @@ Or any static server on `public/`:
 npx --yes serve public
 ```
 
-## Deploy to Cloudflare Pages → fx.nyptid.com
+## Deploy
 
-1. Log in: `npx wrangler login`
-2. Ship the folder:
+Already live on **https://fx.nyptid.com**.
 
 ```bash
+npx wrangler login
 npm run deploy
 ```
 
-3. In the Cloudflare dashboard: **Workers & Pages → fx-nyptid → Custom domains → `fx.nyptid.com`**.
-4. If `nyptid.com` is already on Cloudflare, Pages will attach the CNAME for `fx` for you. If the zone lives elsewhere, CNAME `fx` to `fx-nyptid.pages.dev`.
-
-First-time project create (if deploy asks):
-
-```bash
-npx wrangler pages project create fx-nyptid --production-branch main
-```
-
-GitHub Action: set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`, then push to `main`.
+That ships Worker `fx` with the custom domain `fx.nyptid.com` on the `nyptid.com` zone. GitHub Action uses the same command — set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` to deploy on push to `main`.
 
 ## Exhibits
 
