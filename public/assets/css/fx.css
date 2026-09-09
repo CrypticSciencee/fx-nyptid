@@ -1253,9 +1253,10 @@ footer {
 .donate-page .sec-head { margin-bottom: 28px; }
 .donate-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.8fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   align-items: start;
+  max-width: 720px;
 }
 .donate-layout .field textarea { min-height: 88px; }
 .gift-panel {
