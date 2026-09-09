@@ -4,7 +4,8 @@
   "description": "FX — forensic ledger of x.com, hosted at fx.nyptid.com",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "scrape": "python scraper/fx_receipts.py --file scraper/urls.txt --out scraper/out/receipts.json"
   },
   "devDependencies": {
     "wrangler": "^4.34.0"

@@ -4,13 +4,13 @@
 
 Photoreal glass case file of [x.com](https://x.com). Why people still like the firehose, why they hate it, and the `@Parodyjeffx` exhibits with **absolute links to every person** in the screenshots.
 
-**Live: [fx.nyptid.com](https://fx.nyptid.com)** · Cloudflare · not affiliated with X Corp.
+**[fx.nyptid.com](https://fx.nyptid.com)** · © FX · by NYPTID Industries Advanced Technologies
 
 The ledger in `public/assets/js/data.js` is the living file. New exhibits, new handles, new hates — this repo is a running list, not a frozen rant.
 
 ## Stack
 
-Static site. No build step. Hosted on Cloudflare Workers static assets at **https://fx.nyptid.com**.
+Static site plus a Worker for the proof form. No cache. Python receipts scraper in `scraper/`.
 
 ```
 public/
@@ -22,6 +22,8 @@ public/
   assets/css/fx.css
   assets/js/data.js  ← people, posts, hates, likes
   assets/js/fx.js
+src/worker.js        ← POST/GET /api/proof
+scraper/fx_receipts.py
 ```
 
 ## Local

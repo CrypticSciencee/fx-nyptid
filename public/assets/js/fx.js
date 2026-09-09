@@ -3,6 +3,15 @@
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
+  const esc = (s) =>
+    String(s || "").replace(/[&<>"']/g, (c) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[c]);
+
   const initials = (name) =>
     name
       .replace(/[^A-Za-z0-9 ]/g, "")
@@ -159,13 +168,12 @@
   }
 
   function spotlight() {
-    const cards = $$(".glass");
-    cards.forEach((el) => {
-      el.addEventListener("pointermove", (e) => {
-        const r = el.getBoundingClientRect();
-        el.style.setProperty("--mx", `${e.clientX - r.left}px`);
-        el.style.setProperty("--my", `${e.clientY - r.top}px`);
-      });
+    document.addEventListener("pointermove", (e) => {
+      const el = e.target.closest(".glass");
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      el.style.setProperty("--mx", `${e.clientX - r.left}px`);
+      el.style.setProperty("--my", `${e.clientY - r.top}px`);
     });
   }
 
@@ -211,7 +219,8 @@
         closeLb();
         nav.classList.remove("open");
       }
-      if (e.key === "/" && document.activeElement?.tagName !== "INPUT") {
+      const tag = document.activeElement?.tagName;
+      if (e.key === "/" && tag !== "INPUT" && tag !== "TEXTAREA") {
         e.preventDefault();
         $("#search")?.focus();
       }
@@ -222,6 +231,65 @@
     $("#lb-close").addEventListener("click", closeLb);
   }
 
+  function proofCard(item) {
+    const extras = (item.extra_urls || [])
+      .map((u) => `<a class="pill" href="${u}" target="_blank" rel="noopener noreferrer">extra</a>`)
+      .join("");
+    return `
+      <article class="proof-card glass">
+        <div class="kicker">@${esc(item.handle)}</div>
+        <p>${esc(item.statement)}</p>
+        <div class="pills">
+          <a class="pill" href="${esc(item.profile_url)}" target="_blank" rel="noopener noreferrer">@${esc(item.handle)}</a>
+          <a class="pill" href="${esc(item.proof_url)}" target="_blank" rel="noopener noreferrer">proof post</a>
+          ${extras}
+        </div>
+        <div class="when">${esc(item.display_name)} · ${new Date(item.created_at).toUTCString()}</div>
+      </article>`;
+  }
+
+  async function loadProofs() {
+    const wall = $("#proof-wall");
+    try {
+      const res = await fetch("/api/proof", { cache: "no-store" });
+      const data = await res.json();
+      const items = data.items || [];
+      wall.innerHTML = items.length
+        ? items.map(proofCard).join("")
+        : `<div class="empty glass">No public filings yet. Be the first. Link the account. Link the post.</div>`;
+    } catch {
+      wall.innerHTML = `<div class="empty glass">The wall is offline. The form still files.</div>`;
+    }
+  }
+
+  function bindProofForm() {
+    const form = $("#proof-form");
+    const status = $("#proof-status");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      status.classList.remove("err");
+      status.textContent = "Filing…";
+      const fd = new FormData(form);
+      const payload = Object.fromEntries(fd.entries());
+      try {
+        const res = await fetch("/api/proof", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          cache: "no-store",
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Rejected.");
+        status.textContent = "Filed. It’s on the wall.";
+        form.reset();
+        await loadProofs();
+      } catch (err) {
+        status.classList.add("err");
+        status.textContent = err.message || "Could not file.";
+      }
+    });
+  }
+
   renderEvidence();
   renderTimeline();
   renderPeople();
@@ -230,4 +298,6 @@
   spotlight();
   counters();
   nav();
+  bindProofForm();
+  loadProofs();
 })();

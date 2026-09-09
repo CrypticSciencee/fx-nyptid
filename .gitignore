@@ -5,3 +5,4 @@ dist/
 *.log
 scripts/attach-domain.js
 scripts/check-domain.js
+scraper/out/
