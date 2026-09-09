@@ -1,0 +1,12 @@
+{
+  "name": "fx-nyptid",
+  "private": true,
+  "description": "FX — forensic ledger of x.com, hosted at fx.nyptid.com",
+  "scripts": {
+    "dev": "wrangler pages dev public",
+    "deploy": "wrangler pages deploy public --project-name fx-nyptid"
+  },
+  "devDependencies": {
+    "wrangler": "^4.34.0"
+  }
+}

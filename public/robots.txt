@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://fx.nyptid.com/index.html
