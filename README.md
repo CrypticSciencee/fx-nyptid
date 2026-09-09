@@ -10,7 +10,7 @@ The ledger in `public/assets/js/data.js` is the living file. New exhibits, new h
 
 ## Stack
 
-Static site plus a Worker. Each nav tab is its own page (`/exhibits`, `/case`, `/hates`, `/people`, `/live`, `/proof`). No cache. Python receipts scraper in `scraper/`.
+Static site plus a Worker. Each nav tab is its own page (`/exhibits`, `/case`, `/hates`, `/people`, `/live`, `/desk`, `/donate`, `/proof`). No cache. Python receipts scraper in `scraper/`.
 
 ```
 public/
@@ -49,6 +49,18 @@ npm run deploy
 ```
 
 That ships Worker `fx` with the custom domain `fx.nyptid.com` on the `nyptid.com` zone. GitHub Action uses the same command — set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` to deploy on push to `main`.
+
+## Donate
+
+[`/donate`](https://fx.nyptid.com/donate) supports genuine journalism on FX. Pledges are logged to KV (`donations`).
+
+Jackson: create a Stripe Payment Link, then:
+
+```bash
+npx wrangler secret put STRIPE_PAYMENT_LINK
+```
+
+Paste the Payment Link URL and redeploy. `/donate` will log the pledge and send people to Stripe. Until the secret is set, pledges still land in KV so nothing is lost.
 
 ## Exhibits
 

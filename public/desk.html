@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Desk | FX</title>
-  <meta name="description" content="Live world desk: oil, Hormuz, clocks, breaking wire.">
+  <meta name="description" content="FX desk: live crude from Yahoo Finance, named world wires, city clocks, and X receipts on one forensic board.">
   <link rel="canonical" href="https://fx.nyptid.com/desk">
   <meta name="theme-color" content="#05060a">
   <meta property="og:title" content="Desk | FX">
@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/css/fx.css?v=11">
+  <link rel="stylesheet" href="/assets/css/fx.css?v=12">
 </head>
 <body class="inner">
   <div class="noise" aria-hidden="true"></div>
@@ -32,71 +32,114 @@
       <a href="/desk" aria-current="page">Desk</a>
       <a href="/proof">Submit proof</a>
     </nav>
-    <a class="nav-cta" href="/live">Live feed</a>
+    <a class="nav-cta" href="/donate">Donate</a>
     <button class="burger" id="burger" type="button" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
   </header>
 
-  <div class="breaking-inline desk-break" aria-hidden="true">
-    <span class="breaking-tag">BREAKING</span>
-    <div class="breaking-track" id="breaking-track">Loading wire…</div>
-  </div>
-
   <main class="page">
     <div class="wrap">
+      <div class="desk-status glass">
+        <span class="onair-live"><i></i> LIVE</span>
+        <span class="mono" id="desk-market">quotes connecting</span>
+        <span class="mono" id="desk-wire-age">wire connecting</span>
+        <span class="mono" id="desk-stamp">—</span>
+        <a class="mono" href="/donate">Support the desk</a>
+      </div>
+
       <div class="sec-head">
         <div>
-          <div class="kicker">World desk</div>
-          <h1>Live oil, Hormuz, and the wire.</h1>
+          <div class="kicker">FX desk</div>
+          <h1>The world the firehose sits on.</h1>
         </div>
-        <p>Same live-desk pattern as TheOSSreport: clocks, crude quotes, a blockade board, and an unfiltered headline rail. Refreshes itself.</p>
+        <p>Live ICE Brent and NYMEX WTI from Yahoo Finance. Headlines from named wires. City clocks with seconds. FX receipts on the same board. Every number is sourced. Nothing here is a clone of another newsroom.</p>
+      </div>
+
+      <div class="fx-ticker glass" role="region" aria-label="Live wire">
+        <span class="fx-ticker-tag"><i></i> WIRE</span>
+        <div class="fx-ticker-view">
+          <div class="fx-ticker-track" id="breaking-track">Connecting to named wires…</div>
+        </div>
       </div>
 
       <div class="clocks" id="clocks">
-        <span data-tz="Asia/Jerusalem">Jerusalem --:--</span>
-        <span data-tz="Asia/Tehran">Tehran --:--</span>
-        <span data-tz="America/New_York">Washington --:--</span>
-        <span data-tz="Europe/Moscow">Moscow --:--</span>
-        <span data-tz="Asia/Shanghai">Beijing --:--</span>
-        <span data-tz="America/Los_Angeles">San Francisco --:--</span>
+        <span data-tz="UTC" data-city="UTC">UTC --:--:--</span>
+        <span data-tz="Asia/Jerusalem" data-city="Jerusalem">Jerusalem --:--:--</span>
+        <span data-tz="Asia/Tehran" data-city="Tehran">Tehran --:--:--</span>
+        <span data-tz="America/New_York" data-city="Washington">Washington --:--:--</span>
+        <span data-tz="Europe/London" data-city="London">London --:--:--</span>
+        <span data-tz="Europe/Moscow" data-city="Moscow">Moscow --:--:--</span>
+        <span data-tz="Asia/Shanghai" data-city="Beijing">Beijing --:--:--</span>
       </div>
-      <p class="mono" id="desk-stamp" style="margin:0 0 22px;color:var(--mute)">Last refresh: —</p>
+
+      <div class="desk-note glass">
+        <span class="kicker" id="hormuz-day">Day —</span>
+        <p>Strait of Hormuz clock starts 28 Feb 2026, the date Reuters used for the first strikes. This is not live AIS. Tanker counts belong to Kpler, Argus, and the wires below, when they publish them.</p>
+      </div>
 
       <div class="oil-grid">
         <article class="proof-card glass">
-          <div class="kicker">Brent crude · BZ=F</div>
+          <div class="kicker">Brent · BZ=F</div>
           <p class="oil-price" id="brent-price">—</p>
-          <span class="oil-chg" id="brent-chg">global benchmark</span>
+          <span class="oil-chg" id="brent-chg">ICE last print</span>
+          <span class="quote-src" id="brent-src">Yahoo Finance</span>
         </article>
         <article class="proof-card glass">
-          <div class="kicker">WTI crude · CL=F</div>
+          <div class="kicker">WTI · CL=F</div>
           <p class="oil-price" id="wti-price">—</p>
-          <span class="oil-chg" id="wti-chg">US benchmark</span>
+          <span class="oil-chg" id="wti-chg">NYMEX last print</span>
+          <span class="quote-src" id="wti-src">Yahoo Finance</span>
         </article>
         <article class="proof-card glass">
-          <div class="kicker">Hormuz</div>
-          <p class="oil-price" id="hormuz-day">Day —</p>
-          <span class="oil-chg">Partially blocked · ~5 transits/day vs 140 pre-war</span>
+          <div class="kicker">Brent − WTI</div>
+          <p class="oil-price" id="spread-price">—</p>
+          <span class="oil-chg" id="spread-chg">live spread</span>
+          <span class="quote-src">ICE minus NYMEX</span>
         </article>
         <article class="proof-card glass">
-          <div class="kicker">Barrels blocked / day</div>
-          <p class="oil-price">~5M</p>
-          <span class="oil-chg">~20% of seaborne crude</span>
+          <div class="kicker">Session</div>
+          <p class="oil-price" id="session-state">—</p>
+          <span class="oil-chg" id="session-chg">futures hours</span>
+          <span class="quote-src" id="session-src">from last Yahoo print</span>
         </article>
       </div>
+      <p class="mono desk-source" id="oil-note">ICE Brent and NYMEX WTI via Yahoo Finance. Futures last print, not a licensed exchange feed.</p>
 
       <div class="tv-wrap glass">
-        <div class="kicker">Market view</div>
+        <div class="kicker">TradingView · TVC:UKOIL</div>
         <iframe title="Brent crude chart" src="https://s.tradingview.com/widgetembed/?frameElementId=tv&amp;symbol=TVC%3AUKOIL&amp;interval=60&amp;hidesidetoolbar=1&amp;symboledit=1&amp;saveimage=0&amp;toolbarbg=05060a&amp;studies=%5B%5D&amp;theme=dark&amp;style=1&amp;timezone=Etc%2FUTC&amp;withdateranges=1&amp;hideideas=1" loading="lazy"></iframe>
       </div>
 
-      <div class="sec-head" style="margin-top:36px">
-        <div>
-          <div class="kicker">Wire</div>
-          <h2>World headlines</h2>
-        </div>
-        <p>BBC, Al Jazeera, energy desk. Unfiltered. Click through to the source.</p>
+      <div class="desk-split">
+        <section>
+          <div class="sec-head">
+            <div>
+              <div class="kicker">Named wires</div>
+              <h2>World headlines</h2>
+            </div>
+            <p>BBC World, Al Jazeera, Guardian, OilPrice. Sorted by publication time. Click through to the source.</p>
+          </div>
+          <div class="wire" id="wire"></div>
+        </section>
+        <section>
+          <div class="sec-head">
+            <div>
+              <div class="kicker">This ledger</div>
+              <h2>FX receipts</h2>
+            </div>
+            <p>The same verified X filings that hit <a href="/live">/live</a>. Newest first.</p>
+          </div>
+          <div class="desk-receipts" id="receipts"></div>
+        </section>
       </div>
-      <div class="wire" id="wire"></div>
+
+      <aside class="donate-band glass">
+        <div>
+          <div class="kicker">Keep the desk honest</div>
+          <h3>Support genuine journalism on FX.</h3>
+          <p>No ads. No X Premium. Receipts, named sources, live quotes. Jackson wires checkout. You keep the lights on.</p>
+        </div>
+        <a class="btn solid" href="/donate">Donate</a>
+      </aside>
     </div>
   </main>
 
@@ -106,9 +149,15 @@
         <img src="/assets/icons/logo.svg" width="36" height="36" alt="">
         <span><strong>© FX</strong><em>fx.nyptid.com</em></span>
       </a>
+      <nav class="foot-links" aria-label="Footer">
+        <a href="/live">Live</a>
+        <a href="/desk">Desk</a>
+        <a href="/donate">Donate</a>
+        <a href="/proof">Proof</a>
+      </nav>
       <p class="byline">by NYPTID Industries Advanced Technologies</p>
     </div>
   </footer>
-  <script src="/assets/js/desk.js?v=11"></script>
+  <script src="/assets/js/desk.js?v=12"></script>
 </body>
 </html>

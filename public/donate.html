@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Donate | FX</title>
+  <meta name="description" content="Support genuine journalism on FX. Keep the forensic ledger, the live desk, and the receipts online.">
+  <link rel="canonical" href="https://fx.nyptid.com/donate">
+  <meta name="theme-color" content="#05060a">
+  <meta property="og:title" content="Donate | FX">
+  <meta property="og:url" content="https://fx.nyptid.com/donate">
+  <meta property="og:image" content="https://fx.nyptid.com/assets/bg/hero.jpg">
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/fx.css?v=12">
+</head>
+<body class="inner">
+  <div class="noise" aria-hidden="true"></div>
+  <header class="nav glass" id="nav">
+    <a class="brand" href="/">
+      <img class="brand-mark" src="/assets/icons/logo.svg" width="28" height="28" alt="">
+      <span>FX</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="/exhibits">Exhibits</a>
+      <a href="/case">Case file</a>
+      <a href="/hates">150 hates</a>
+      <a href="/people">People</a>
+      <a href="/live" class="nav-live">Live feed</a>
+      <a href="/desk">Desk</a>
+      <a href="/proof">Submit proof</a>
+    </nav>
+    <a class="nav-cta" href="/donate" aria-current="page">Donate</a>
+    <button class="burger" id="burger" type="button" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </header>
+
+  <main class="page">
+    <div class="wrap donate-wrap">
+      <div class="sec-head">
+        <div>
+          <div class="kicker">Support FX</div>
+          <h1>Genuine journalism. Named sources. No ads.</h1>
+        </div>
+        <p>FX is a forensic ledger of x.com and a live world desk. Receipts, not vibes. If this is useful, keep the scraper, the quotes, and the wires running.</p>
+      </div>
+
+      <div class="donate-layout">
+        <form class="proof-form glass" id="donate-form" novalidate>
+          <div class="kicker" id="donate-ready">Checkout status</div>
+          <p class="sheet-lede" id="donate-lede">Pick an amount. Jackson is wiring Stripe. Until checkout is live, the pledge is logged so nothing is lost.</p>
+          <div class="field">
+            <label>Amount (USD)</label>
+            <div class="amount-row" id="amount-row">
+              <button type="button" data-amount="5">$5</button>
+              <button type="button" data-amount="15">$15</button>
+              <button type="button" class="sel" data-amount="40">$40</button>
+              <button type="button" data-amount="100">$100</button>
+              <button type="button" data-amount="250">$250</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="amount">Custom amount</label>
+            <input id="amount" name="amount" type="number" min="1" max="100000" step="1" value="40" required>
+          </div>
+          <div class="field">
+            <label for="name">Name <span class="mute">(optional)</span></label>
+            <input id="name" name="name" type="text" maxlength="80" placeholder="How we should thank you">
+          </div>
+          <div class="field">
+            <label for="email">Email <span class="mute">(optional, for a receipt)</span></label>
+            <input id="email" name="email" type="email" maxlength="120" placeholder="you@example.com" autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="note">Note <span class="mute">(optional)</span></label>
+            <textarea id="note" name="note" rows="3" maxlength="500" placeholder="Why you are backing the desk."></textarea>
+          </div>
+          <div class="form-actions">
+            <button class="btn solid" type="submit" id="donate-submit">Pledge and continue</button>
+            <p class="form-status" id="donate-status" role="status"></p>
+          </div>
+        </form>
+
+        <aside class="proof-aside glass">
+          <div class="kicker">Where it goes</div>
+          <h3>The desk, the scraper, the wall.</h3>
+          <p>Donations support genuine true journalism on FX: live crude quotes, named wires, verified X receipts, and the people who keep the case file honest.</p>
+          <p class="mono" style="margin-top:16px">Stripe Payment Link is the checkout. Jackson sets <code>STRIPE_PAYMENT_LINK</code> on the Worker. This page already logs every pledge.</p>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <a class="foot-brand" href="/">
+        <img src="/assets/icons/logo.svg" width="36" height="36" alt="">
+        <span><strong>© FX</strong><em>fx.nyptid.com</em></span>
+      </a>
+      <nav class="foot-links" aria-label="Footer">
+        <a href="/live">Live</a>
+        <a href="/desk">Desk</a>
+        <a href="/donate">Donate</a>
+        <a href="/proof">Proof</a>
+      </nav>
+      <p class="byline">by NYPTID Industries Advanced Technologies</p>
+    </div>
+  </footer>
+  <script src="/assets/js/donate.js?v=12"></script>
+</body>
+</html>

@@ -7,5 +7,6 @@
   <url><loc>https://fx.nyptid.com/people</loc><changefreq>weekly</changefreq></url>
   <url><loc>https://fx.nyptid.com/live</loc><changefreq>hourly</changefreq></url>
   <url><loc>https://fx.nyptid.com/desk</loc><changefreq>hourly</changefreq></url>
+  <url><loc>https://fx.nyptid.com/donate</loc><changefreq>weekly</changefreq></url>
   <url><loc>https://fx.nyptid.com/proof</loc><changefreq>daily</changefreq></url>
 </urlset>

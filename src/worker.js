@@ -116,6 +116,186 @@ function escapeXml(value) {
     .replace(/"/g, "&quot;");
 }
 
+function decodeEntities(value) {
+  return String(value || "")
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCharCode(parseInt(h, 16)))
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
+}
+
+const mem = {
+  oil: { exp: 0, data: null },
+  world: { exp: 0, data: null }
+};
+
+async function remember(slot, ttl, fn) {
+  const now = Date.now();
+  if (mem[slot].data && now < mem[slot].exp) return mem[slot].data;
+  try {
+    const data = await fn();
+    mem[slot] = { exp: now + ttl, data };
+    return data;
+  } catch (err) {
+    if (mem[slot].data) return mem[slot].data;
+    throw err;
+  }
+}
+
+function lastClose(result) {
+  const closes = result?.indicators?.quote?.[0]?.close || [];
+  for (let i = closes.length - 1; i >= 0; i -= 1) {
+    if (closes[i] != null && Number.isFinite(Number(closes[i]))) return Number(closes[i]);
+  }
+  return null;
+}
+
+function tradingState(meta) {
+  const now = Math.floor(Date.now() / 1000);
+  const regular = meta?.currentTradingPeriod?.regular;
+  if (regular && Number(regular.start) <= now && now < Number(regular.end)) return "OPEN";
+  const state = String(meta?.marketState || "").toUpperCase();
+  if (state === "REGULAR" || state === "OPEN") return "OPEN";
+  return "CLOSED";
+}
+
+async function fetchQuote(symbol) {
+  const urls = [
+    `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1m&range=1d`,
+    `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=5d`
+  ];
+  let lastErr;
+  for (const endpoint of urls) {
+    try {
+      const r = await fetch(endpoint, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+          Accept: "application/json"
+        }
+      });
+      if (!r.ok) throw new Error(String(r.status));
+      const payload = await r.json();
+      const result = payload.chart.result[0];
+      const meta = result.meta;
+      const price = Number(meta.regularMarketPrice ?? lastClose(result));
+      const prev = Number(meta.chartPreviousClose || meta.previousClose || price);
+      const change = prev ? ((price - prev) / prev) * 100 : 0;
+      let ts = Number(meta.regularMarketTime || 0);
+      if (ts && ts < 1e12) ts *= 1000;
+      return {
+        symbol,
+        price,
+        prev,
+        change,
+        currency: meta.currency || "USD",
+        exchange: meta.fullExchangeName || meta.exchangeName || "",
+        quoted_at: ts ? new Date(ts).toISOString() : new Date().toISOString(),
+        state: tradingState(meta)
+      };
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+  throw lastErr || new Error("quote failed");
+}
+
+async function loadOil() {
+  const [brent, wti] = await Promise.all([fetchQuote("BZ=F"), fetchQuote("CL=F")]);
+  return {
+    brent,
+    wti,
+    spread: Number((brent.price - wti.price).toFixed(2)),
+    generated_at: new Date().toISOString(),
+    source: "Yahoo Finance",
+    note: "ICE Brent (BZ=F) and NYMEX WTI (CL=F) last print via Yahoo Finance. Futures. Not a licensed exchange feed."
+  };
+}
+
+function rssTag(block, tag) {
+  const re = new RegExp(
+    `<${tag}[^>]*>\\s*(?:<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>|([^<]*))\\s*</${tag}>`,
+    "i"
+  );
+  const match = block.match(re);
+  return decodeEntities((match && (match[1] || match[2])) || "").trim();
+}
+
+function rssLink(block) {
+  const href = block.match(/<link[^>]+href=["']([^"']+)["']/i);
+  if (href) return decodeEntities(href[1]).trim();
+  return rssTag(block, "link");
+}
+
+const WORLD_FEEDS = [
+  { name: "BBC World", url: "https://feeds.bbci.co.uk/news/world/rss.xml" },
+  { name: "Al Jazeera", url: "https://www.aljazeera.com/xml/rss/all.xml" },
+  { name: "Guardian", url: "https://www.theguardian.com/world/rss" },
+  { name: "OilPrice", url: "https://oilprice.com/rss/main" }
+];
+
+async function loadWorld() {
+  const results = await Promise.all(
+    WORLD_FEEDS.map(async (feed) => {
+      try {
+        const xml = await fetch(feed.url, {
+          headers: {
+            "User-Agent": "fx.nyptid.com desk/1.0",
+            Accept: "application/rss+xml, application/xml, text/xml, */*"
+          },
+          signal: AbortSignal.timeout(8000)
+        }).then((r) => r.text());
+        return { feed, xml };
+      } catch {
+        return { feed, xml: "" };
+      }
+    })
+  );
+
+  const items = [];
+  const seen = new Set();
+  for (const { feed, xml } of results) {
+    if (!xml) continue;
+    const blocks = xml.split(/<item[\s>]/i).slice(1, 8);
+    for (const block of blocks) {
+      const title = clean(rssTag(block, "title"), 220);
+      const url = clean(rssLink(block), 400);
+      const date = rssTag(block, "pubDate") || rssTag(block, "updated") || rssTag(block, "dc:date");
+      if (!title || !url || !/^https?:\/\//i.test(url)) continue;
+      if (/\/sports\//i.test(url)) continue;
+      const key = title.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      const parsed = Date.parse(date);
+      items.push({
+        source: feed.name,
+        title,
+        url,
+        published: Number.isFinite(parsed) ? new Date(parsed).toISOString() : ""
+      });
+    }
+  }
+  items.sort((a, b) => Date.parse(b.published || 0) - Date.parse(a.published || 0));
+  return { items: items.slice(0, 24), generated_at: new Date().toISOString() };
+}
+
+function stripeCheckout(base, pledge) {
+  if (!base) return null;
+  try {
+    const parsed = new URL(base);
+    if (pledge?.email) parsed.searchParams.set("prefilled_email", pledge.email);
+    if (pledge?.id) parsed.searchParams.set("client_reference_id", pledge.id);
+    return parsed.toString();
+  } catch {
+    return base;
+  }
+}
+
 async function ingestStatus(env, statusUrl, source, extra = {}, opts = {}) {
   const postUrl = xUrl(statusUrl);
   if (!STATUS.test(postUrl)) return { ok: false, reason: "Not an x.com/status URL." };
@@ -155,7 +335,8 @@ export default {
       "/people": "/people.html",
       "/proof": "/proof.html",
       "/live": "/live.html",
-      "/desk": "/desk.html"
+      "/desk": "/desk.html",
+      "/donate": "/donate.html"
     };
     const cleanPath = url.pathname.replace(/\/+$/, "") || "/";
     const pageFile = PAGES[cleanPath];
@@ -185,8 +366,12 @@ export default {
         }
         const feedUrl = clean(body.feed || body.url, 400);
         if (!/^https:\/\//i.test(feedUrl)) return json({ error: "Need an https RSS URL." }, 400);
-        const xml = await fetch(feedUrl, { headers: { "User-Agent": "fx.nyptid.com scraper/1.0" } }).then((r) => r.text());
-        const found = [...xml.matchAll(/https?:\/\/(?:www\.)?(?:x|twitter)\.com\/[A-Za-z0-9_]+\/status\/\d+/gi)].map((m) => m[0]);
+        const xml = await fetch(feedUrl, { headers: { "User-Agent": "fx.nyptid.com scraper/1.0" } }).then((r) =>
+          r.text()
+        );
+        const found = [...xml.matchAll(/https?:\/\/(?:www\.)?(?:x|twitter)\.com\/[A-Za-z0-9_]+\/status\/\d+/gi)].map(
+          (m) => m[0]
+        );
         const unique = [...new Set(found)].slice(0, 25);
         const ingested = [];
         for (const link of unique) {
@@ -202,66 +387,85 @@ export default {
     }
 
     if (url.pathname === "/api/oil" && request.method === "GET") {
-      const quote = async (symbol) => {
-        const r = await fetch(
-          `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=5d`,
-          { headers: { "User-Agent": "Mozilla/5.0 fx.nyptid.com desk" } }
-        );
-        if (!r.ok) throw new Error(String(r.status));
-        const j = await r.json();
-        const meta = j.chart.result[0].meta;
-        const price = Number(meta.regularMarketPrice);
-        const prev = Number(meta.chartPreviousClose || meta.previousClose || price);
-        const change = prev ? ((price - prev) / prev) * 100 : 0;
-        return { symbol, price, prev, change, currency: meta.currency || "USD" };
-      };
       try {
-        const [brent, wti] = await Promise.all([quote("BZ=F"), quote("CL=F")]);
-        return json({
-          brent,
-          wti,
-          generated_at: new Date().toISOString()
-        });
+        return json(await remember("oil", 20000, loadOil));
       } catch (err) {
         return json({ error: "Oil quotes unavailable.", detail: String(err) }, 502);
       }
     }
 
     if (url.pathname === "/api/world" && request.method === "GET") {
-      const feeds = [
-        { name: "BBC World", url: "https://feeds.bbci.co.uk/news/world/rss.xml" },
-        { name: "Al Jazeera", url: "https://www.aljazeera.com/xml/rss/all.xml" },
-        { name: "CNBC Energy", url: "https://www.cnbc.com/id/19854910/device/rss/rss.html" }
-      ];
-      const items = [];
-      for (const feed of feeds) {
-        try {
-          const xml = await fetch(feed.url, {
-            headers: { "User-Agent": "fx.nyptid.com desk/1.0" }
-          }).then((r) => r.text());
-          const blocks = xml.split(/<item[\s>]/i).slice(1, 7);
-          for (const block of blocks) {
-            const title = (block.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/i) || [])
-              .filter(Boolean)
-              .pop();
-            const link = (block.match(/<link><!\[CDATA\[(.*?)\]\]><\/link>|<link>(.*?)<\/link>/i) || [])
-              .filter(Boolean)
-              .pop();
-            const date = (block.match(/<pubDate>(.*?)<\/pubDate>/i) || [])[1];
-            if (title && link) {
-              items.push({
-                source: feed.name,
-                title: clean(title, 220),
-                url: clean(link, 400),
-                published: date || ""
-              });
-            }
-          }
-        } catch {
-          /* skip a dead feed */
-        }
+      try {
+        return json(await remember("world", 45000, loadWorld));
+      } catch (err) {
+        return json({ error: "Wire unavailable.", detail: String(err), items: [] }, 502);
       }
-      return json({ items, generated_at: new Date().toISOString() });
+    }
+
+    if (url.pathname === "/api/desk" && request.method === "GET") {
+      const [oilSettled, worldSettled, feed] = await Promise.all([
+        remember("oil", 20000, loadOil).catch((err) => ({ error: "Oil quotes unavailable.", detail: String(err) })),
+        remember("world", 45000, loadWorld).catch(() => ({ items: [], generated_at: new Date().toISOString() })),
+        readList(env, "feed")
+      ]);
+      return json({
+        oil: oilSettled,
+        world: worldSettled.items || [],
+        world_at: worldSettled.generated_at || new Date().toISOString(),
+        receipts: (feed || []).slice(0, 8),
+        generated_at: new Date().toISOString()
+      });
+    }
+
+    if (url.pathname === "/api/donate" && request.method === "GET") {
+      const stripe = env.STRIPE_PAYMENT_LINK || null;
+      return json({
+        stripe,
+        ready: Boolean(stripe),
+        currency: "USD",
+        note: stripe
+          ? "Stripe checkout is live."
+          : "Pledges are logged. Jackson wires Stripe with STRIPE_PAYMENT_LINK."
+      });
+    }
+
+    if (url.pathname === "/api/donate" && request.method === "POST") {
+      let body;
+      try {
+        body = await request.json();
+      } catch {
+        return json({ error: "Send JSON." }, 400);
+      }
+      const amount = Number(body.amount);
+      if (!Number.isFinite(amount) || amount < 1 || amount > 100000) {
+        return json({ error: "Pick an amount between 1 and 100000." }, 400);
+      }
+
+      const ip = request.headers.get("CF-Connecting-IP") || "0";
+      const rlKey = `rl:donate:${ip}`;
+      const hits = Number((await env.PROOF.get(rlKey)) || "0");
+      if (hits >= 12) return json({ error: "Slow down. Come back in an hour." }, 429);
+      await env.PROOF.put(rlKey, String(hits + 1), { expirationTtl: 3600 });
+
+      const pledge = {
+        id: crypto.randomUUID(),
+        amount,
+        currency: "USD",
+        email: clean(body.email, 120),
+        name: clean(body.name, 80),
+        note: clean(body.note, 500),
+        created_at: new Date().toISOString()
+      };
+      const rows = await readList(env, "donations");
+      rows.unshift(pledge);
+      await writeList(env, "donations", rows);
+      const stripe = stripeCheckout(env.STRIPE_PAYMENT_LINK, pledge);
+      return json({
+        ok: true,
+        pledge,
+        stripe,
+        ready: Boolean(stripe)
+      });
     }
 
     if (url.pathname === "/api/feed" && request.method === "GET") {
