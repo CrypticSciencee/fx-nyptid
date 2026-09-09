@@ -279,11 +279,33 @@
   function bindProofForm() {
     const form = $("#proof-form");
     const status = $("#proof-status");
+    const sheet = $("#sheet");
+    const open = $("#open-sheet");
+    const close = $("#sheet-close");
+    const submitBtn = $("#proof-submit");
+    open?.addEventListener("click", () => {
+      if (!sheet) return;
+      sheet.hidden = false;
+      requestAnimationFrame(() => sheet.classList.add("open"));
+      $("#handle")?.focus();
+    });
+    const hideSheet = () => {
+      if (!sheet) return;
+      sheet.classList.remove("open");
+      setTimeout(() => {
+        sheet.hidden = true;
+      }, 320);
+    };
+    close?.addEventListener("click", hideSheet);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && sheet && !sheet.hidden) hideSheet();
+    });
     if (!form) return;
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       status.classList.remove("err");
-      status.textContent = "Filing…";
+      status.textContent = "Scraping X…";
+      if (submitBtn) submitBtn.disabled = true;
       const fd = new FormData(form);
       const payload = Object.fromEntries(fd.entries());
       try {
@@ -295,12 +317,17 @@
         });
         const out = await res.json();
         if (!res.ok) throw new Error(out.error || "Rejected.");
-        status.textContent = "Filed. It’s on the wall.";
+        status.textContent = "Verified. Live on the wire.";
         form.reset();
-        await loadProofs();
+        setTimeout(() => {
+          hideSheet();
+          window.location.href = "/live";
+        }, 700);
       } catch (err) {
         status.classList.add("err");
-        status.textContent = err.message || "Could not file.";
+        status.textContent = err.message || "Could not verify.";
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
       }
     });
   }

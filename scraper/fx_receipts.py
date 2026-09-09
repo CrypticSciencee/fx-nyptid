@@ -93,9 +93,18 @@ def main() -> int:
         default="",
         help="POST receipts to the live feed, e.g. https://fx.nyptid.com/api/feed",
     )
+    parser.add_argument("--rss", help="RSS/Atom URL. X status links inside it get ingested.")
     args = parser.parse_args()
 
     urls = load_urls(args)
+    if args.rss:
+        xml = requests.get(args.rss, timeout=30, headers={"User-Agent": "fx.nyptid.com scraper/1.0"}).text
+        for match in re.findall(
+            r"https?://(?:www\.)?(?:x|twitter)\.com/[A-Za-z0-9_]+/status/\d+", xml, flags=re.I
+        ):
+            urls.append(normalize(match) or match.replace("twitter.com", "x.com").split("?")[0])
+        seen = set()
+        urls = [u for u in urls if u and not (u in seen or seen.add(u))]
     if not urls:
         print("No valid x.com/status URLs.", file=sys.stderr)
         return 1
