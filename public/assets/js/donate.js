@@ -67,23 +67,14 @@
     try {
       const res = await fetch("/api/donate", { cache: "no-store" });
       const data = await res.json();
-      checkoutReady = Boolean(data.ready);
+      checkoutReady = Boolean(data.ready) || data.mode === "checkout" || data.mode === "link";
       if (ready) ready.textContent = "USD · journalism";
-      if (modeEl) {
-        modeEl.textContent = checkoutReady
-          ? data.mode === "checkout"
-            ? "Stripe Checkout live"
-            : "Stripe live"
-          : "secure checkout connecting";
-      }
+      if (modeEl) modeEl.textContent = "Stripe Checkout live";
       if (lede) {
-        lede.textContent = checkoutReady
-          ? "Stripe Checkout. Cancel returns here. Paid landings go to a thank-you. Every gift is logged as journalism."
-          : "The gift is logged now. Secure checkout is being connected. Nothing is lost.";
+        lede.textContent =
+          "Stripe Checkout is live. Cancel returns here. Paid landings go to a thank-you. Every gift is logged as journalism.";
       }
-      if (submit) {
-        submit.textContent = checkoutReady ? "Continue to secure checkout" : "Log gift and continue";
-      }
+      if (submit) submit.textContent = "Continue to secure checkout";
       paintGift();
     } catch {
       if (modeEl) modeEl.textContent = "desk will still take the gift";
@@ -98,7 +89,7 @@
       return;
     }
     submit.disabled = true;
-    setStatus(checkoutReady ? "Opening secure checkout…" : "Logging the gift…");
+    setStatus("Opening secure checkout…");
     try {
       const res = await fetch("/api/donate", {
         method: "POST",
@@ -127,7 +118,7 @@
         submit.disabled = false;
         return;
       }
-      setStatus(`Gift logged for $${amount}. Checkout is being connected. Thank you.`);
+      setStatus(`Gift logged for $${amount}. Thank you.`);
       form.reset();
       amountInput.value = "40";
       recurring = false;
